@@ -81,15 +81,7 @@ This project is published under Apache license, and currently in ***Development*
 	B: Green
 	C: Blue
 	```
-	
-	* Multi line template stanza
-	```
-	${question.title}
-	$[question.options]
-		${index}:
-		    ${option}
-	$[]
-	```
+
 	> Attention: The line only contains the '$[]' place holder will not output a new line. 
 
 > If the array selected contains array/JsonArray/List, use ```${0}```, ```${1}``` to select params in it.
@@ -180,6 +172,7 @@ This project is published under Apache license, and currently in ***Development*
 
 
 ### Maven
+
 ```xml
 <dependency>
 	<groupId>com.github.swiftech</groupId>
@@ -190,4 +183,4 @@ This project is published under Apache license, and currently in ***Development*
 
 
 ### Known issues
-* Not support windows line breaks yet.
+...
