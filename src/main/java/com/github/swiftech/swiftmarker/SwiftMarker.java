@@ -37,10 +37,11 @@ public class SwiftMarker {
         if (StringUtils.isBlank(template)) {
             throw new RuntimeException("Template required");
         }
-        templateEngine.setTemplate(template);
         if (config != null) {
+            Logger.getInstance().setEnabled(config.isDebug());
             templateEngine.setConfig(config);
         }
+        templateEngine.setTemplate(template);
         return this;
     }
 

@@ -39,7 +39,7 @@ public class DefaultDataModelHandler<C> implements DataModelHandler {
 
         Iterable dataMatrix = dataModelHelper.getValueRecursively(container, arrayKey, Iterable.class);
         if (dataMatrix == null) {
-            System.out.println("No collection or key-value object in the data model by key: " + arrayKey);
+            Logger.getInstance().warn("No collection or key-value object in the data model by key: " + arrayKey);
             return ret;
         }
 

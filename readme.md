@@ -1,7 +1,9 @@
 # SwiftMarker
 
-SwiftMarker is a lightweight template engine.
-This project is published under Apache license, and currently in ***Development***
+SwiftMarker is a lightweight template engine. 
+SwiftMarker是一个轻量级的模板引擎
+
+> This project is published under Apache license, and currently in ***Development***
 
 
 ### Features
@@ -9,6 +11,11 @@ This project is published under Apache license, and currently in ***Development*
 * Simple and easy to use but flexible.
 * You can use dotted name like ```foo.bar``` to select params in data model.
 * Multiple types are supported to composite data model: array, ```List```, ```JsonArray```, ```Map```, ```JsonObject``` and plain Bean object, you can combine them freely.
+
+
+### Dependencies
+* commons-lang3 3.7+
+* gson 2.8+
 
 ### Tutorial
 
@@ -82,7 +89,7 @@ This project is published under Apache license, and currently in ***Development*
 	C: Blue
 	```
 
-	> Attention: The line only contains the '$[]' place holder will not output a new line. 
+	> Attention: The line only contains the '$[]' place holder will not output a new line.
 
 > If the array selected contains array/JsonArray/List, use ```${0}```, ```${1}``` to select params in it.
 
@@ -171,13 +178,33 @@ This project is published under Apache license, and currently in ***Development*
 > Of course, you can have these data model types nested.
 
 
+* Config
+
+	* You can customize SwiftMarker by provide a ```Config``` object to it.
+	```java
+	...
+	SwiftMarker swiftMarker = new SwiftMarker();
+	Config config = new Config();
+	config.setDebug(true);
+    swiftMarker.prepare(strTemplate, config);
+	...
+	```
+
+	* Options to config SwiftMarker:
+
+name|description|default
+-|-|-
+debug|是否输出日志|false
+inputLineBreaker|输入文件换行符|\\n
+outputLineBreaker|输出文件换行符|\\n
+
 ### Maven
 
 ```xml
 <dependency>
 	<groupId>com.github.swiftech</groupId>
 	<artifactId>swiftmarker</artifactId>
-	<version>1.0-BETA</version>
+	<version>1.0-RC</version>
 </dependency>
 ```
 
