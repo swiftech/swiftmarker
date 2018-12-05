@@ -8,12 +8,13 @@ SwiftMarker是一个轻量级的模板引擎
 
 ### Features
 * Lightweight and few dependencies.
-* Simple and easy to use but flexible.
+* Simple and easy to use but flexible. Only support basic expressions so that it can run fast.
 * You can use dotted name like ```foo.bar``` to select params in data model.
 * Multiple types are supported to composite data model: array, ```List```, ```JsonArray```, ```Map```, ```JsonObject``` and plain Bean object, you can combine them freely.
 
 
 ### Dependencies
+* java 1.7
 * commons-lang3 3.7+
 * gson 2.8+
 
@@ -133,7 +134,7 @@ SwiftMarker是一个轻量级的模板引擎
 	```
 
 
-* Multi line template stanza
+* Multiple line template stanza
 
 	Template
 	```
@@ -194,9 +195,9 @@ SwiftMarker是一个轻量级的模板引擎
 
 name|description|default
 -|-|-
-debug|是否输出日志|false
-inputLineBreaker|输入文件换行符|\\n
-outputLineBreaker|输出文件换行符|\\n
+debug|true to output debug logs|false
+inputLineBreaker|line breaker of input|\\n
+outputLineBreaker|line breaker of output|\\n
 
 ### Maven
 
@@ -208,6 +209,17 @@ outputLineBreaker|输出文件换行符|\\n
 </dependency>
 ```
 
+
+### Limitation
+* You can not have any reserved words in you template text, it will recognized as expression.
+* Nesting collection rendering is not supported. You can not have following template:
+```
+$[collection1]
+$[collection2]
+...
+$[]
+$[]
+```
 
 ### Known issues
 ...
