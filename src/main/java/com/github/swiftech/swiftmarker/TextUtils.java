@@ -18,8 +18,8 @@ public class TextUtils {
         if (keys == null || values == null) {
             return src;
         }
-        if (keys.length > values.length) {
-            throw new RuntimeException("Not keys for this template");
+        if (values.length < keys.length) {
+            throw new RuntimeException("Not enough values for keys");
         }
         String ret = src;
         for (int i = 0; i < keys.length; i++) {

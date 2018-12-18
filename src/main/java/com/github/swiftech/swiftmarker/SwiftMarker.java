@@ -24,7 +24,7 @@ import org.apache.commons.lang3.StringUtils;
  **/
 public class SwiftMarker {
 
-    private TemplateEngine templateEngine = new TemplateEngine();
+    private TemplateEngine2 templateEngine = new TemplateEngine2();
 
     /**
      * Prepare the template before rendering.
@@ -62,6 +62,6 @@ public class SwiftMarker {
      * @return
      */
     public String render(Object dataModel) {
-        return this.templateEngine.eachLine(new DefaultDataModelHandler<>(dataModel));
+        return this.templateEngine.process(new StackDataModelHandler(dataModel));
     }
 }

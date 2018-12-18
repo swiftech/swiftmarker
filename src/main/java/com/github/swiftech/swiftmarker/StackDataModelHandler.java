@@ -1,34 +1,34 @@
 package com.github.swiftech.swiftmarker;
 
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import org.apache.commons.lang3.StringUtils;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.*;
 
 /**
- * @param <C>
  * @author swiftech 2018-06-22
- * @deprecated 只支持简单的数据处理
  */
-public class DefaultDataModelHandler<C> implements DataModelHandler {
-
-    private C container;
+public class StackDataModelHandler implements DataModelHandler {
 
     private DataModelHelper dataModelHelper;
 
-    public DefaultDataModelHandler(C container) {
-        this.container = container;
+    // 循环的数据堆栈
+    private Stack<Object> dataModelStack = new Stack<>();
+
+    public StackDataModelHandler(Object container) {
+        if (container.getClass().isPrimitive()) {
+            throw new IllegalArgumentException("DataMode can not be primitive");
+        }
+        dataModelStack.push(container);
         dataModelHelper = new DataModelHelper();
     }
 
     @Override
     public boolean isLogicalTrue(String key) {
-        return isLogicalTrue(this.container, key);
-    }
-
-    @Override
-    public boolean isLogicalTrue(Object container, String key) {
-        Object value = dataModelHelper.getValueRecursively(container, key, Object.class);
+        Object dataModel = this.getDataModel();
+        Object value = dataModelHelper.getValueRecursively(dataModel, key, Object.class);
         if (value == null) {
             return false;
         }
@@ -47,14 +47,30 @@ public class DefaultDataModelHandler<C> implements DataModelHandler {
         else if (value instanceof Calendar) {
             return ((Calendar) value).getTimeInMillis() > 0;
         }
+        else if (value instanceof JsonPrimitive) {
+            if (((JsonPrimitive) value).isBoolean()) {
+                return ((JsonPrimitive) value).getAsBoolean();
+            }
+            else if (((JsonPrimitive) value).isNumber()) {
+                return ((JsonPrimitive) value).getAsNumber().doubleValue() > 0;
+            }
+            else if (((JsonPrimitive) value).isString()) {
+                return ((JsonPrimitive) value).getAsString().length() > 0;
+            }
+        }
         return false;
+    }
+
+    @Override
+    public boolean isLogicalTrue(Object container, String key) {
+        throw new NotImplementedException();
     }
 
     @Override
     public List<String> onLine(String[] keysInLine) {
         List<String> ret = new ArrayList<>();
         for (String key : keysInLine) {
-            Object v = dataModelHelper.getValueRecursively(container, key, Object.class);
+            Object v = dataModelHelper.getValueRecursively(getDataModel(), key, Object.class);
             if (v != null) {
                 ret.add(v.toString());
             }
@@ -66,7 +82,7 @@ public class DefaultDataModelHandler<C> implements DataModelHandler {
     public LoopMatrix onLoop(String loopKey) {
         List<Map<String, Object>> ret = new ArrayList<>();
 
-        Iterable dataMatrix = dataModelHelper.getValueRecursively(container, loopKey, Iterable.class);
+        Iterable dataMatrix = dataModelHelper.getValueRecursively(getDataModel(), loopKey, Iterable.class);
         if (dataMatrix == null) {
             Logger.getInstance().warn("No collection or key-value object in the data model by key: " + loopKey);
             return new LoopMatrix(ret);
@@ -81,33 +97,33 @@ public class DefaultDataModelHandler<C> implements DataModelHandler {
                     // 从数组成员中获值
                     Object v = dataModelHelper.getValueRecursively(dataRow, k, Object.class);
                     if (v != null) {
-                        m.put(k, v.toString());
+                        m.put(k, v);
                     }
                 }
             }
             else if (dataRow instanceof Map) {
                 for (Object k : ((Map) dataRow).keySet()) {
-                    String v = dataModelHelper.getValueRecursively(dataRow, (String) k, String.class);
+                    Object v = dataModelHelper.getValueRecursively(dataRow, (String) k, Object.class);
                     m.put(k.toString(), v);
                 }
             }
             else if (ObjectUtils.isIterableList(dataRow)) {
                 int i = 0;
                 for (Object v : ((Iterable) dataRow)) {
-                    m.put(String.valueOf(i++), v.toString());
+                    m.put(String.valueOf(i++), v);
                 }
             }
             else if (dataRow.getClass().isArray()) {
                 Object[] arow = (Object[]) dataRow;
                 for (int i = 0; i < arow.length; i++) {
-                    m.put(String.valueOf(i), arow[i].toString());
+                    m.put(String.valueOf(i), arow[i]);
                 }
             }
             else if (!ObjectUtils.isPrimitive(dataRow)) {
                 // Bean对象处理
                 Collection<String> allFieldsName = dataModelHelper.getAllFieldsName(dataRow.getClass());
                 for (String k : allFieldsName) {
-                    String v = dataModelHelper.getValueRecursively(dataRow, k, String.class);
+                    Object v = dataModelHelper.getValueRecursively(dataRow, k, Object.class);
                     m.put(k, v);
                 }
             }
@@ -116,18 +132,19 @@ public class DefaultDataModelHandler<C> implements DataModelHandler {
         return new LoopMatrix(ret);
     }
 
-    @Override
     public Object getDataModel() {
+        if (!dataModelStack.empty()) {
+            return dataModelStack.peek();
+        }
         return null;
     }
 
-    @Override
     public void pushDataModel(Object dataModel) {
-
+        dataModelStack.push(dataModel);
     }
 
-    @Override
     public Object popDataModel() {
-        return null;
+        return dataModelStack.pop();
     }
+
 }

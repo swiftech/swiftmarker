@@ -3,6 +3,7 @@ package com.github.swiftech.swiftmarker;
 /**
  * 日志处理，用 enable 来控制是否输出
  * TODO: 日志回调交给调用方去处理日志。
+ *
  * @author swiftech 2018-11-29
  **/
 public class Logger {
@@ -27,15 +28,15 @@ public class Logger {
     }
 
     public void error(String msg) {
-        if (isEnabled) System.out.printf("[SwiftMarker]   [ERR] %s%n", msg);
+        System.out.printf("[SwiftMarker]   [ERR] %s%n", msg);
     }
 
     public void warn(String msg) {
-        if (isEnabled) System.out.printf("[SwiftMarker]  [WARN] %s%n", msg);
+        System.out.printf("[SwiftMarker]  [WARN] %s%n", msg);
     }
 
     public void info(String msg) {
-        if (isEnabled) System.out.printf("[SwiftMarker]  [INFO] %s%n", msg);
+        System.out.printf("[SwiftMarker]  [INFO] %s%n", msg);
     }
 
     public void debug(String msg) {
@@ -43,6 +44,10 @@ public class Logger {
     }
 
     public void data(String data) {
-        if (isEnabled) System.out.println(data);
+        if (isEnabled) {
+            System.out.println("--------------------------------");
+            System.out.println(data);
+            System.out.println("--------------------------------");
+        }
     }
 }

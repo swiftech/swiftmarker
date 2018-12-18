@@ -28,21 +28,21 @@ public class DataModelHelper {
 
     private <T> T _getValueRecursively(Object jo, String[] keys, int i, Class<T> retType) {
         String key = keys[i];
-        Object value = getValue(jo, key);
+        Object value = this.getValue(jo, key);
         if (value == null) {
             return null;
         }
         if (ObjectUtils.isPrimitive(value)) {
             if (i == keys.length - 1) {
                 // 找到最终的值
-                return (T) getAsString(value);
+                return (T) getAsIs(value);
             }
             else {
                 return null; // 没有找到，或者类型不匹配
             }
         }
         else if (value.getClass().isArray()) {
-            return (T)Arrays.asList((Object[]) value);
+            return (T) Arrays.asList((Object[]) value);
         }
         else if (ObjectUtils.isIterableList(value)) {
             if (i == keys.length - 1) {
@@ -66,11 +66,33 @@ public class DataModelHelper {
         }
     }
 
+    private Object getAsIs(Object o) {
+        if (o instanceof JsonPrimitive) {
+            JsonPrimitive jp = (JsonPrimitive) o;
+            if (jp.isString()) {
+                return jp.getAsString();
+            }
+            else if (jp.isNumber()) {
+                return jp.getAsNumber();
+            }
+            else if (jp.isBoolean()) {
+                return jp.getAsBoolean();
+            }
+            else {
+                return jp.getAsString();
+            }
+        }
+        else {
+            return o.toString();
+        }
+    }
+
     /**
      * 把一个对象转换成字符串
      *
      * @param o
      * @return
+     * @deprecated
      */
     private String getAsString(Object o) {
         if (o instanceof JsonPrimitive) {
@@ -104,7 +126,8 @@ public class DataModelHelper {
         else {
             try {
                 return forceGetProperty(container, key);
-            } catch (NoSuchFieldException e) {
+            } catch (Exception e) {
+                System.out.printf("Failed to get property '%s' from '%s'%n", key, container);
                 e.printStackTrace();
                 return null;
             }
