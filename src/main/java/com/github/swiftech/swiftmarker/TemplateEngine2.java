@@ -177,6 +177,9 @@ public class TemplateEngine2 {
     }
 
     private String processLoop(String templateStanza, LoopMatrix loopMatrix) {
+        if (StringUtils.isBlank(templateStanza)) {
+            throw new RuntimeException("Template stanza is empty");
+        }
         StringBuilder outBuf = new StringBuilder();
         if (loopMatrix == null || loopMatrix.getMatrix().isEmpty()) {
             // 没有提供参数值，直接输出模板
