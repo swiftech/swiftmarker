@@ -71,7 +71,10 @@ public class StackDataModelHandler implements DataModelHandler {
         List<String> ret = new ArrayList<>();
         for (String key : keysInLine) {
             Object v = dataModelHelper.getValueRecursively(getDataModel(), key, Object.class);
-            if (v != null) {
+            if (v == null) {
+                ret.add("");
+            }
+            else {
                 ret.add(v.toString());
             }
         }
