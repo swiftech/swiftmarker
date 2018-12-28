@@ -1,8 +1,24 @@
+/*
+ * Copyright 2018 Yuxing Wang.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.github.swiftech.swiftmarker;
 
 
 import org.apache.commons.lang3.StringUtils;
 
+import javax.activation.DataHandler;
 import java.util.List;
 import java.util.Map;
 
@@ -12,7 +28,7 @@ import java.util.Map;
  * ${xxx} 表示直接用对应的值进行替换
  * 如果用$[xxx]开头的表示用此行作为模板遍历数组
  * 注意：一行只能存在一个数组遍历的情况，如果有多个，只处理第一个。
- *
+ * <p>
  * 1. 循环可以嵌套循环
  * 2. 逻辑判断可以嵌套逻辑判断
  * 3. 循环和逻辑判断可以互相嵌套（如果逻辑判断在循环中取值的话，则取子数据集中的数据）
@@ -77,10 +93,28 @@ public class TemplateEngine2 {
             if (ctx.isOutLogic()) {
                 log.info("    quitting logic");
                 if (ctx.isInLoop()) {
-                    ctx.appendToBuffer(line).append(config.getInputLineBreaker());
+                    ctx.appendToBuffer(line).append(config.getOutputLineBreaker());
                 }
                 else {
-                    ctx.popLogicState();
+                    if (ctx.isStartLogic()) {
+                        log.info("    entering logic");
+                        String logicKey = ctx.getLogicKey();
+                        ctx.pushLogic(dataHandler.isLogicalTrue(logicKey));
+                        log.debug("    logic value: " + ctx.isLogicTrue());
+                        String pre = StringUtils.substringBefore(line, "?{" + logicKey + "}");
+                        String post = StringUtils.substringAfter(line, Constants.EXP_LOGIC_END);
+                        ctx.appendToBuffer(pre);
+                        if (ctx.isLogicTrue()) {
+                            String raw = StringUtils.substringBetween(line, "?{" + logicKey + "}", Constants.EXP_LOGIC_END);
+                            String retLine = replaceKeys(raw, dataHandler);
+                            ctx.appendToBuffer(retLine);
+                        }
+                        ctx.appendToBuffer(post).append(config.getOutputLineBreaker());
+                        ctx.popLogicState();
+                    }
+                    else {
+                        ctx.popLogicState();
+                    }
                 }
             }
             else {
@@ -103,7 +137,6 @@ public class TemplateEngine2 {
                     // 直接结束了
                     if (ctx.isOutLoop()) {
                         log.debug("    end in line");
-                        StringBuilder outputBuf = ctx.popBuffer();
                         String rendered = processLoop(StringUtils.substringBefore(subTemp, "$[]"), loopMatrix);
                         ctx.appendToBuffer(rendered);
                         ctx.popLoopState();
@@ -128,7 +161,7 @@ public class TemplateEngine2 {
                         // 单独的数组尾，这一行不需要作为模板处理
                     }
                     else {
-                        stanzaBuf.append(StringUtils.substringBefore(line, Constants.TEMPLATE_LOOP_END));
+                        stanzaBuf.append(StringUtils.substringBefore(line, Constants.EXP_LOOP_END));
                     }
 
                     if (ctx.isInLoop()) {
@@ -149,7 +182,6 @@ public class TemplateEngine2 {
                         log.debug("    logic value: " + ctx.isLogicTrue());
                     }
                 }
-
                 // 无状态改变
                 else {
                     log.debug("    ...");
@@ -160,15 +192,13 @@ public class TemplateEngine2 {
                     else {
                         processLine(line, dataHandler, ctx);
                     }
-                    continue;// 等待下一行一起处理
+//                    continue;// 等待下一行一起处理
                 }
 
                 // 特殊处理文末
                 if (i == lines.length - 1) {
                     log.info("reach to the end");
-                    int start = ctx.getBuffer().length() - config.getOutputLineBreaker().length();
-                    int end = ctx.getBuffer().length();
-                    ctx.deleteInBuffer(start, end);
+                    ctx.trimTail(config);
                 }
             }
 
@@ -221,14 +251,29 @@ public class TemplateEngine2 {
             }
             else {
                 // 渲染这一行
-                log.info("    String params: " + StringUtils.join(keys, ","));
-                List<String> values = dataHandler.onLine(keys);
-                String retLine = TextUtils.replaceWith(line, keys, values.toArray(new String[0]));
-                log.info("    Render: ");
-                log.data(retLine);
+//                log.info("    String params: " + StringUtils.join(keys, ","));
+//                List<String> values = dataHandler.onLine(keys);
+//                String retLine = TextUtils.replaceWith(line, keys, values.toArray(new String[0]));
+//                log.info("    Render: ");
+//                log.data(retLine);
+                String retLine = replaceKeys(line, dataHandler);
                 ctx.appendToBuffer(retLine).append(config.getOutputLineBreaker());
             }
         }
+    }
+
+    private String replaceKeys(String text, DataModelHandler dataHandler) {
+        String[] keys = StringUtils.substringsBetween(text, "${", "}");
+        if (keys == null || keys.length == 0) {
+            log.warn("    No place holders for this line.");
+            return text;
+        }
+        log.info("    String params: " + StringUtils.join(keys, ","));
+        List<String> values = dataHandler.onLine(keys);
+        String retText = TextUtils.replaceWith(text, keys, values.toArray(new String[0]));
+        log.info("    Render: ");
+        log.data(retText);
+        return retText;
     }
 
 

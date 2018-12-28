@@ -70,10 +70,10 @@ public class TemplateEngine {
 
             // 判断逻辑表达式结尾
             if (inProcessLogic) {
-                if (StringUtils.contains(line, Constants.TEMPLATE_LOGIC_END)) {
+                if (StringUtils.contains(line, Constants.EXP_LOGIC_END)) {
                     inProcessLogic = false; // 逻辑处理结束
                     isLogicTrue = true;// 逻辑标志重置，等待下一次判断
-                    line = StringUtils.replace(line, Constants.TEMPLATE_LOGIC_END, "");
+                    line = StringUtils.replace(line, Constants.EXP_LOGIC_END, "");
                 }
             }
             if (!isLogicTrue) {
@@ -117,7 +117,7 @@ public class TemplateEngine {
                 linesValues = dataHandler.onLoop(arrKey);
 
                 // 直接结束了
-                if (StringUtils.endsWith(line.trim(), Constants.TEMPLATE_LOOP_END)) {
+                if (StringUtils.endsWith(line.trim(), Constants.EXP_LOOP_END)) {
                     log.debug("    end in line");
                     processLineValues(linesValues.getMatrix(), StringUtils.substringBefore(subTemp, "$[]"), outputBuf);
                 }
@@ -135,17 +135,17 @@ public class TemplateEngine {
             }
             else if (inProcessMultiLine) {
                 // 处理数组-末行
-                if (StringUtils.endsWith(line.trim(), Constants.TEMPLATE_LOOP_END)) {
+                if (StringUtils.endsWith(line.trim(), Constants.EXP_LOOP_END)) {
                     log.debug("  >");
                     // 跳出数组段模板循环
                     inProcessMultiLine = false;
 
-                    if (Constants.TEMPLATE_LOOP_END.equals(line.trim())) {
+                    if (Constants.EXP_LOOP_END.equals(line.trim())) {
                         // 单独的数组尾，这一行不需要作为模板处理
                     }
                     else {
                         log.debug("    the end");
-                        stanza.append(StringUtils.substringBefore(line, Constants.TEMPLATE_LOOP_END));
+                        stanza.append(StringUtils.substringBefore(line, Constants.EXP_LOOP_END));
                     }
                     processLineValues(linesValues.getMatrix(), stanza.toString(), outputBuf);
                 }

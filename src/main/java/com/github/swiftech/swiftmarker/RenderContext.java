@@ -54,7 +54,7 @@ public class RenderContext {
     }
 
     public boolean isOutLogic() {
-        if (StringUtils.contains(line, Constants.TEMPLATE_LOGIC_END)) {
+        if (StringUtils.contains(line, Constants.EXP_LOGIC_END)) {
             return true;
         }
         return false;
@@ -117,7 +117,7 @@ public class RenderContext {
      * @return
      */
     public boolean isOutLoop() {
-        if (StringUtils.endsWith(line.trim(), Constants.TEMPLATE_LOOP_END)) {
+        if (StringUtils.endsWith(line.trim(), Constants.EXP_LOOP_END)) {
             return true;
         }
         return false;
@@ -131,7 +131,7 @@ public class RenderContext {
 
 
     public boolean isWholeLineLoopEnd() {
-        return Constants.TEMPLATE_LOOP_END.equals(line.trim());
+        return Constants.EXP_LOOP_END.equals(line.trim());
     }
 
 
@@ -175,12 +175,19 @@ public class RenderContext {
         return buf;
     }
 
+
+    public void trimTail(Config config) {
+        int start = this.getBuffer().length() - config.getOutputLineBreaker().length();
+        int end = this.getBuffer().length();
+        this.deleteInBuffer(start, end);
+    }
+
     /**
      * @param startInclusive
      * @param endExclusive
      * @return
      */
-    public StringBuilder deleteInBuffer(int startInclusive, int endExclusive) {
+    private StringBuilder deleteInBuffer(int startInclusive, int endExclusive) {
         StringBuilder buf = renderBufStack.peek();
         if (buf == null) {
             throw new IllegalStateException("Render buffer is empty");
