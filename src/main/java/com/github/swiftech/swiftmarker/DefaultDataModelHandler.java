@@ -51,7 +51,7 @@ public class DefaultDataModelHandler<C> implements DataModelHandler {
     }
 
     @Override
-    public List<String> onLine(String[] keysInLine) {
+    public List<String> onKeys(String[] keysInLine) {
         List<String> ret = new ArrayList<>();
         for (String key : keysInLine) {
             Object v = dataModelHelper.getValueRecursively(container, key, Object.class);
@@ -117,7 +117,12 @@ public class DefaultDataModelHandler<C> implements DataModelHandler {
     }
 
     @Override
-    public Object getDataModel() {
+    public Object getTopDataModel() {
+        return null;
+    }
+
+    @Override
+    public Object getRootDataModel() {
         return null;
     }
 

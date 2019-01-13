@@ -175,7 +175,10 @@ public class RenderContext {
         return buf;
     }
 
-
+    /**
+     * 删除整个文本的结尾
+     * @param config
+     */
     public void trimTail(Config config) {
         int start = this.getBuffer().length() - config.getOutputLineBreaker().length();
         int end = this.getBuffer().length();
@@ -183,6 +186,7 @@ public class RenderContext {
     }
 
     /**
+     * 删除文本缓存中指定位置区间的字符
      * @param startInclusive
      * @param endExclusive
      * @return

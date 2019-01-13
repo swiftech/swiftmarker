@@ -17,17 +17,25 @@ public class StackDataModelHandler implements DataModelHandler {
     // 循环的数据堆栈
     private Stack<Object> dataModelStack = new Stack<>();
 
+    // 根数据模型（即全局的数据模型）
+    private Object rootDataModel;
+
     public StackDataModelHandler(Object container) {
+        this(container, container);
+    }
+
+    public StackDataModelHandler(Object container, Object rootDataModel) {
         if (container.getClass().isPrimitive()) {
-            throw new IllegalArgumentException("DataMode can not be primitive");
+            throw new IllegalArgumentException("DataModel can not be primitive");
         }
-        dataModelStack.push(container);
-        dataModelHelper = new DataModelHelper();
+        this.dataModelStack.push(container);
+        this.dataModelHelper = new DataModelHelper();
+        this.rootDataModel = rootDataModel;
     }
 
     @Override
     public boolean isLogicalTrue(String key) {
-        Object dataModel = this.getDataModel();
+        Object dataModel = this.getTopDataModel();
         Object value = dataModelHelper.getValueRecursively(dataModel, key, Object.class);
         if (value == null) {
             return false;
@@ -67,11 +75,21 @@ public class StackDataModelHandler implements DataModelHandler {
     }
 
     @Override
-    public List<String> onLine(String[] keysInLine) {
+    public List<String> onKeys(String[] keys) {
         List<String> ret = new ArrayList<>();
-        for (String key : keysInLine) {
-            Object v = dataModelHelper.getValueRecursively(getDataModel(), key, Object.class);
+        for (String key : keys) {
+            Object v;
+            if (key.startsWith(".")) {
+                v = dataModelHelper.getValueRecursively(
+                        getTopDataModel(),
+                        StringUtils.substringAfter(key.trim(), ".").trim(),
+                        Object.class);
+            }
+            else {
+                v = dataModelHelper.getValueRecursively(rootDataModel, key, Object.class);
+            }
             if (v == null) {
+
                 ret.add("");
             }
             else {
@@ -85,7 +103,7 @@ public class StackDataModelHandler implements DataModelHandler {
     public LoopMatrix onLoop(String loopKey) {
         List<Map<String, Object>> ret = new ArrayList<>();
 
-        Iterable dataMatrix = dataModelHelper.getValueRecursively(getDataModel(), loopKey, Iterable.class);
+        Iterable dataMatrix = dataModelHelper.getValueRecursively(getTopDataModel(), loopKey, Iterable.class);
         if (dataMatrix == null) {
             Logger.getInstance().warn("No collection or key-value object in the data model by key: " + loopKey);
             return new LoopMatrix(ret);
@@ -135,11 +153,15 @@ public class StackDataModelHandler implements DataModelHandler {
         return new LoopMatrix(ret);
     }
 
-    public Object getDataModel() {
+    public Object getTopDataModel() {
         if (!dataModelStack.empty()) {
             return dataModelStack.peek();
         }
         return null;
+    }
+
+    public Object getRootDataModel() {
+        return rootDataModel;
     }
 
     public void pushDataModel(Object dataModel) {
@@ -149,5 +171,7 @@ public class StackDataModelHandler implements DataModelHandler {
     public Object popDataModel() {
         return dataModelStack.pop();
     }
+
+
 
 }

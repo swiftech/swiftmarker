@@ -25,12 +25,12 @@ public interface DataModelHandler {
     boolean isLogicalTrue(Object container, String key);
 
     /**
-     * 处理一行
+     * 处理一段字符串中所有的表达式 key
      *
-     * @param keysInLine 行所有的 key
-     * @return 行所有的 key 的取值
+     * @param keys
+     * @return 所有的 key 的取值
      */
-    List<String> onLine(String[] keysInLine);
+    List<String> onKeys(String[] keys);
 
     /**
      * 处理多行
@@ -44,7 +44,13 @@ public interface DataModelHandler {
      * 获取栈顶的数据模型
      * @return
      */
-    Object getDataModel();
+    Object getTopDataModel();
+
+    /**
+     * 获取根数据模型
+     * @return
+     */
+    Object getRootDataModel();
 
     /**
      * 压入数据模型至栈顶

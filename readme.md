@@ -133,6 +133,32 @@ SwiftMarker是一个轻量级的模板引擎
 	C: Blue
 	```
 
+* Logic Expression
+	
+	* Template:
+	```
+	?{logic1}
+	${say}
+	?{}
+	?{logic2}
+	${think}
+	?{}
+	```
+
+	* Data Model:
+	```
+	{
+		"logic1": true,
+		"say": "hello github",
+		"logic2": false,
+		"think": "fxxk M$"
+	}
+	```
+	
+	* Result:
+	```
+	hello github
+	```
 
 * Multiple line template stanza
 

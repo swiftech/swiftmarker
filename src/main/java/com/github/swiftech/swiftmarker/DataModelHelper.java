@@ -127,8 +127,8 @@ public class DataModelHelper {
             try {
                 return forceGetProperty(container, key);
             } catch (Exception e) {
-                System.out.printf("Failed to get property '%s' from '%s'%n", key, container);
-                e.printStackTrace();
+                Logger.getInstance().warn(String.format("Failed to get property '%s' from '%s'%n", key, container));
+//                e.printStackTrace();
                 return null;
             }
         }
@@ -167,7 +167,7 @@ public class DataModelHelper {
         try {
             result = field.get(object);
         } catch (IllegalAccessException e) {
-            System.out.printf("Can't get %s.%s value%n", object.getClass().getName(), propertyName);
+            Logger.getInstance().warn(String.format("Can't get %s.%s value%n", object.getClass().getName(), propertyName));
         }
         field.setAccessible(accessible);
         return result;

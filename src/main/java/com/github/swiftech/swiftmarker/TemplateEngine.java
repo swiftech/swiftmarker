@@ -194,7 +194,7 @@ public class TemplateEngine {
             return;
         }
         log.info("    String params: " + StringUtils.join(keys, ","));
-        List<String> values = lineHandler.onLine(keys);
+        List<String> values = lineHandler.onKeys(keys);
         String retLine = TextUtils.replaceWith(line, keys, values.toArray(new String[0]));
         log.info("    Render: ");
         log.data(retLine);
