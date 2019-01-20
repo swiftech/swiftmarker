@@ -117,7 +117,7 @@ public class RenderContext {
      * @return
      */
     public boolean isOutLoop() {
-        if (StringUtils.endsWith(line.trim(), Constants.EXP_LOOP_END)) {
+        if (StringUtils.contains(line.trim(), Constants.EXP_LOOP_END)) {
             return true;
         }
         return false;
@@ -129,7 +129,10 @@ public class RenderContext {
         }
     }
 
-
+    /**
+     * 整行都是结尾（去空格）
+     * @return
+     */
     public boolean isWholeLineLoopEnd() {
         return Constants.EXP_LOOP_END.equals(line.trim());
     }
@@ -143,6 +146,7 @@ public class RenderContext {
     }
 
     /**
+     * 创建一个新的渲染缓存并推入堆栈
      * @return
      */
     public StringBuilder createBuffer() {
