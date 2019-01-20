@@ -1,5 +1,6 @@
 package com.github.swiftech.swiftmarker;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import org.apache.commons.lang3.StringUtils;
@@ -35,13 +36,22 @@ public class StackDataModelHandler implements DataModelHandler {
 
     @Override
     public boolean isLogicalTrue(String key) {
-        Object dataModel = this.getTopDataModel();
-        Object value = dataModelHelper.getValueRecursively(dataModel, key, Object.class);
+        Object value = parseValueLocalOrGlobal(key);
         if (value == null) {
             return false;
         }
         else if (value instanceof String) {
-            return StringUtils.isNotBlank((CharSequence) value);
+            if ("yes".equalsIgnoreCase((String) value)
+                    || "y".equalsIgnoreCase((String) value)) {
+                return true;
+            }
+            else if ("no".equalsIgnoreCase((String) value)
+                    || "n".equalsIgnoreCase((String) value)) {
+                return false;
+            }
+            else {
+                return StringUtils.isNotBlank((CharSequence) value);
+            }
         }
         else if (value instanceof Number) {
             return ((Number) value).longValue() > 0;
@@ -66,6 +76,21 @@ public class StackDataModelHandler implements DataModelHandler {
                 return ((JsonPrimitive) value).getAsString().length() > 0;
             }
         }
+        else if (value instanceof Collection) {
+            return ((Collection) value).size() > 0;
+        }
+        else if (value instanceof JsonArray) {
+            return ((JsonArray) value).size() > 0;
+        }
+        else if (value instanceof Map) {
+            return ((Map) value).size() > 0;
+        }
+        else if (value instanceof JsonObject) {
+            return ((JsonObject) value).size() > 0;
+        }
+        else if (value.getClass().isArray()) {
+            return ((Object[]) value).length > 0;
+        }
         return false;
     }
 
@@ -78,25 +103,29 @@ public class StackDataModelHandler implements DataModelHandler {
     public List<String> onKeys(String[] keys) {
         List<String> ret = new ArrayList<>();
         for (String key : keys) {
-            Object v;
-            if (key.startsWith(".")) {
-                v = dataModelHelper.getValueRecursively(
-                        getTopDataModel(),
-                        StringUtils.substringAfter(key.trim(), ".").trim(),
-                        Object.class);
-            }
-            else {
-                v = dataModelHelper.getValueRecursively(rootDataModel, key, Object.class);
-            }
+            Object v = parseValueLocalOrGlobal(key);
             if (v == null) {
-
-                ret.add("");
+                ret.add(StringUtils.EMPTY);
             }
             else {
                 ret.add(v.toString());
             }
         }
         return ret;
+    }
+
+    private Object parseValueLocalOrGlobal(String key) {
+        Object v;
+        if (key.startsWith(".")) {
+            v = dataModelHelper.getValueRecursively(
+                    getTopDataModel(),
+                    StringUtils.substringAfter(key.trim(), ".").trim(),
+                    Object.class);
+        }
+        else {
+            v = dataModelHelper.getValueRecursively(rootDataModel, key, Object.class);
+        }
+        return v;
     }
 
     @Override
@@ -171,7 +200,6 @@ public class StackDataModelHandler implements DataModelHandler {
     public Object popDataModel() {
         return dataModelStack.pop();
     }
-
 
 
 }

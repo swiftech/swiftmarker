@@ -1,5 +1,6 @@
 package com.github.swiftech.swiftmarker;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import org.apache.commons.lang3.StringUtils;
@@ -49,7 +50,8 @@ public class DataModelHelper {
                 return (T) value; // 返回集合本身
             }
             else {
-                return null; // 没有找到，或者类型不匹配
+                return _getValueRecursively(value, keys, ++i, retType);
+//                return null; // 没有找到，或者类型不匹配
             }
         }
         else if (ObjectUtils.isKeyValueObject(value)) {
@@ -122,6 +124,20 @@ public class DataModelHelper {
                 return null;
             }
             return ((JsonObject) container).get(key);
+        }
+        else if (container instanceof List || container instanceof JsonArray) {
+            if (StringUtils.isNumeric(key)) {
+                int index = Integer.parseInt(key);
+                if (container instanceof List) {
+                    return ((List) container).get(index);
+                }
+                else {
+                    return ((JsonArray) container).get(index);
+                }
+            }
+            else {
+                return null;
+            }
         }
         else {
             try {
