@@ -179,7 +179,7 @@ SwiftMarker是一个轻量级的模板引擎
 	* logic condition judgement for object types:
 
 Logic|String|Number|Boolean|Date|Calendar|JsonPrimitive|Collection|JsonArray|Map|JsonObject|Array
--|-
+-|-|-|-|-|-|-|-|-|-|-|-
 Logic true|Y/y/YES/yes/Yes/非空字符串|>0|true|>0|>0|true/>0|size()>0|size()>0|size()>0|size()>0|length>0
 Logic false|N/n/NO/no/No/空字符串|<=0|true|=0|=0|true/<=0|size()=0|size()=0|size()=0|size()=0|length=0
 
