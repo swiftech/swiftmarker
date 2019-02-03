@@ -1,6 +1,7 @@
 # SwiftMarker
 
-SwiftMarker is a lightweight template engine. 
+SwiftMarker is a lightweight template engine.
+
 SwiftMarker是一个轻量级的模板引擎
 
 > This project is published under Apache license, and currently in ***Development***
@@ -9,9 +10,10 @@ SwiftMarker是一个轻量级的模板引擎
 ### Features
 * Lightweight and few dependencies.
 * Simple and easy to use but flexible. Only support basic expressions so that it can run fast.
-* You can use dotted name like ```foo.bar``` to select params in data model.
-* Multiple types are supported to composite data model: array, ```List```, ```JsonArray```, ```Map```, ```JsonObject``` and plain Bean object, you can combine them freely.
-
+* You can simply use dotted name like ```foo.bar``` to select params in data model.
+* Multiple types are supported to composite data model: array, ```List```, ```JsonArray```, ```Map```, ```JsonObject``` and even plain Bean object. you can combine them freely.
+* Loop expression
+* Logic expression
 
 ### Dependencies
 * java 1.7
@@ -58,15 +60,18 @@ SwiftMarker是一个轻量级的模板引擎
 	hate leads to suffering.
 	```
 
-* Collection (with key-value elements)
+* loop expression with key-value elements
 
-	Use ```$[]``` to select array/JsonArray/List in data model and use ```${}``` to select params in key-value element.
+	Use ```$[]``` to select array/JsonArray/List in data model and use ```${}``` to select params in key-value element. To select params in the loop the expression must starts with '.', expression in the loop starts without '.' will select params from the global data model.
+
 	* Template
 	```
 	${question.title}
-	$[question.options]${index}: ${option}$[]
+	$[question.options]${.index}: ${.option}$[]
+
+	My choice is: ${question.options.1.index}
 	```
-	> Attention: ends with '$[]' is required for the template stanza.
+	> Notice: ends with '$[]' is required for the template stanza.
 
 	* Data Model
 	```javascript
@@ -88,22 +93,23 @@ SwiftMarker是一个轻量级的模板引擎
 	A: Red
 	B: Green
 	C: Blue
+
+	My choice is: B
 	```
 
-	> Attention: The line only contains the '$[]' place holder will not output a new line.
-
-> If the array selected contains array/JsonArray/List, use ```${0}```, ```${1}``` to select params in it.
+	> Notice: The line only contains the '$[]' place holder will not output a new line.
 
 > Limits:
 > * Only one array/JsonArray/List place holder ```$[]``` is allowed for one line,
 
 
-* Collection (with array/JsonArray/List element)
+* Loop expression with array/JsonArray/List element
+	If the array selected contains array/JsonArray/List, use ```${.0}```, ```${.1}```... to select params in the elements.
 
 	* Template
 	```
 	${question.title}
-	$[question.options]${0}: ${1}$[]
+	$[question.options]${.0}: ${.1}$[]
 	```
 
 	* Data Model
@@ -133,8 +139,10 @@ SwiftMarker是一个轻量级的模板引擎
 	C: Blue
 	```
 
+
 * Logic Expression
-	
+	Logic expression is used to decide whether or not display content in it, you can have any layer nesting logic expression. Only the expression condition determined to logic true
+
 	* Template:
 	```
 	?{logic1}
@@ -142,6 +150,13 @@ SwiftMarker是一个轻量级的模板引擎
 	?{}
 	?{logic2}
 	${think}
+	?{}
+
+	?{logic1}
+	${say}
+		?{logic2}
+	${think}
+		?{}
 	?{}
 	```
 
@@ -154,25 +169,23 @@ SwiftMarker是一个轻量级的模板引擎
 		"think": "fxxk M$"
 	}
 	```
-	
+
 	* Result:
 	```
 	hello github
+	hello github
 	```
 
-* Multiple line template stanza
+	* logic condition judgement for object types:
 
-	Template
-	```
-	${question.title}
-	$[question.options]
-		${index}:
-		    ${option}
-	$[]
-	```
+Logic|String|Number|Boolean|Date|Calendar|JsonPrimitive|Collection|JsonArray|Map|JsonObject|Array
+-|-
+Logic true|Y/y/YES/yes/Yes/非空字符串|>0|true|>0|>0|true/>0|size()>0|size()>0|size()>0|size()>0|length>0
+Logic false|N/n/NO/no/No/空字符串|<=0|true|=0|=0|true/<=0|size()=0|size()=0|size()=0|size()=0|length=0
 
 
-* Other supported data model type
+
+* Other supported data model object types
 
 	* Map
 	```java
@@ -202,7 +215,8 @@ SwiftMarker是一个轻量级的模板引擎
 	......
 	swiftMarker.render(yoda);
 	```
-> Of course, you can have these data model types nested.
+
+> Of course, you can have all these data objects nested in any way.
 
 
 * Config
@@ -231,14 +245,15 @@ outputLineBreaker|line breaker of output|\\n
 <dependency>
 	<groupId>com.github.swiftech</groupId>
 	<artifactId>swiftmarker</artifactId>
-	<version>1.0-RC</version>
+	<version>2.0-BETA3</version>
 </dependency>
 ```
 
 
 ### Limitation
 * You can not have any reserved words in you template text, it will recognized as expression.
-* Nesting collection rendering is not supported. You can not have following template:
+* You can't have multiple loop expression in one line.
+* Nesting loop expression is not supported. You can not have following expression:
 ```
 $[collection1]
 $[collection2]
@@ -246,6 +261,7 @@ $[collection2]
 $[]
 $[]
 ```
+* Comments in the template is not supported.
 
 ### Known issues
 ...
