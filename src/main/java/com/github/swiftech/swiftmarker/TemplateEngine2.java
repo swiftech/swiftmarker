@@ -26,12 +26,12 @@ import java.util.Map;
  * 规则：
  * ${xxx} 表示直接用对应的值进行替换
  * 如果用$[xxx]开头的表示用此行作为模板遍历数组
- * 注意：一行只能存在一个数组遍历的情况，如果有多个，只处理第一个。
+ * 注意：一行只能存在一个循环表达式，如果有多个，只处理第一个。
  * <p>
  * 1. 循环可以嵌套循环
  * 2. 逻辑判断可以嵌套逻辑判断
  * 3. 循环和逻辑判断可以互相嵌套（如果逻辑判断在循环中取值的话，则取子数据集中的数据）
- *
+ * </p>
  * @author swiftech
  */
 public class TemplateEngine2 {
@@ -54,6 +54,11 @@ public class TemplateEngine2 {
         this.config = config;
     }
 
+    /**
+     * 执行模板渲染处理
+     * @param dataHandler
+     * @return
+     */
     public String process(DataModelHandler dataHandler) {
         if (StringUtils.isBlank(template)) {
             throw new RuntimeException("Template not loaded");
@@ -252,24 +257,24 @@ public class TemplateEngine2 {
     }
 
     /**
-     * 处理简单的一行
+     * 处理模板片段的渲染
      *
-     * @param line
+     * @param stanza
      * @param dataHandler
      * @param ctx
      */
-    private void processGeneralExpressions(String line, boolean isEndOfLine, DataModelHandler dataHandler, RenderContext ctx) {
-        if (StringUtils.isBlank(line)) {
+    private void processGeneralExpressions(String stanza, boolean isEndOfLine, DataModelHandler dataHandler, RenderContext ctx) {
+        if (StringUtils.isBlank(stanza)) {
             // 处理空行
-            ctx.appendToBuffer(line);
+            ctx.appendToBuffer(stanza);
             if (isEndOfLine) ctx.appendToBuffer(config.getOutputLineBreaker());
             return;
         }
-        String[] keys = StringUtils.substringsBetween(line, "${", "}");
+        String[] keys = StringUtils.substringsBetween(stanza, "${", "}");
         // 没有参数，原样不动的返回一行
         if (keys == null || keys.length == 0) {
             log.warn("    No place holders for this line.");
-            ctx.appendToBuffer(line);
+            ctx.appendToBuffer(stanza);
             if (isEndOfLine) ctx.appendToBuffer(config.getOutputLineBreaker());
         }
         else {
@@ -277,32 +282,32 @@ public class TemplateEngine2 {
                 return;
             }
             else {
-                // 渲染这一行
-                String retLine = replaceKeys(line, dataHandler);
-                ctx.appendToBuffer(retLine);
+                String rendered = replaceKeys(stanza, dataHandler);
+                ctx.appendToBuffer(rendered);
                 if (isEndOfLine) ctx.appendToBuffer(config.getOutputLineBreaker());
             }
         }
     }
 
     /**
-     * @param text
+     * 直接用 DataModelHandler 渲染模板片段
+     * @param stanza
      * @param dataHandler
      * @return
      */
-    private String replaceKeys(String text, DataModelHandler dataHandler) {
-        String[] keys = StringUtils.substringsBetween(text, "${", "}");
+    private String replaceKeys(String stanza, DataModelHandler dataHandler) {
+        String[] keys = StringUtils.substringsBetween(stanza, "${", "}");
         if (keys == null || keys.length == 0) {
             log.warn("    No place holders for this line.");
-            return text;
+            return stanza;
         }
         log.info(String.format("    String params: [ %s ]", StringUtils.join(keys, ", ")));
         List<String> values = dataHandler.onKeys(keys);
         log.info(String.format("    Values: [ %s ]", StringUtils.join(values, ", ")));
-        String retText = TextUtils.replaceWith(text, keys, values.toArray(new String[0]));
+        String rendered = TextUtils.replaceWith(stanza, keys, values.toArray(new String[0]));
         log.info("    Render: ");
-        log.data(retText);
-        return retText;
+        log.data(rendered);
+        return rendered;
     }
 
 
