@@ -251,8 +251,8 @@ outputLineBreaker|line breaker of output|\\n
 
 
 ### Limitation
-* You can not have any reserved words in you template text, it will recognized as expression.
-* You can't have multiple loop expression in one line.
+* You can not have any reserved words in you template text, it will be recognized as expression.
+* You can not have multiple loop expression in one line.
 * Nesting loop expression is not supported. You can not have following expression:
 ```
 $[collection1]
