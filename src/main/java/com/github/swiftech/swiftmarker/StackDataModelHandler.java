@@ -35,8 +35,20 @@ public class StackDataModelHandler implements DataModelHandler {
     }
 
     @Override
+    public boolean isLogicalTrueOrFalse(String key) {
+        // 实现逻辑非操作
+        if (key.trim().startsWith("!")) {
+            String actualKey = StringUtils.substring(key.trim(), 1);
+            return !this.isLogicalTrue(actualKey);
+        }
+        else {
+            return this.isLogicalTrue(key.trim());
+        }
+    }
+
+    @Override
     public boolean isLogicalTrue(String key) {
-        Object value = parseValueLocalOrGlobal(key);
+        Object value = this.parseValueLocalOrGlobal(key);
         if (value == null) {
             return false;
         }
@@ -114,6 +126,12 @@ public class StackDataModelHandler implements DataModelHandler {
         return ret;
     }
 
+    /**
+     * 确定是局部变量还是全局变量
+     *
+     * @param key
+     * @return
+     */
     private Object parseValueLocalOrGlobal(String key) {
         Object v;
         if (key.startsWith(".")) {

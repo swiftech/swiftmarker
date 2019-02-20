@@ -32,6 +32,7 @@ import java.util.Map;
  * 2. 逻辑判断可以嵌套逻辑判断
  * 3. 循环和逻辑判断可以互相嵌套（如果逻辑判断在循环中取值的话，则取子数据集中的数据）
  * </p>
+ *
  * @author swiftech
  */
 public class TemplateEngine2 {
@@ -56,6 +57,7 @@ public class TemplateEngine2 {
 
     /**
      * 执行模板渲染处理
+     *
      * @param dataHandler
      * @return
      */
@@ -105,8 +107,8 @@ public class TemplateEngine2 {
                         String expLogicStart = "?{" + logicKey + "}";
                         String pre = StringUtils.substringBefore(line, expLogicStart);
                         processGeneralExpressions(pre, false, dataHandler, ctx);
-                        ctx.pushLogic(dataHandler.isLogicalTrue(logicKey));
-                        log.debug("    logic value: " + ctx.isLogicTrue());
+                        ctx.pushLogic(dataHandler.isLogicalTrueOrFalse(logicKey));
+                        log.debug(String.format("    logic expression: %s = %s", logicKey, ctx.isLogicTrue()));
                         if (ctx.isLogicTrue()) {
                             String raw = StringUtils.substringBetween(line, expLogicStart, Constants.EXP_LOGIC_END);
                             String retLine = replaceKeys(raw, dataHandler);
@@ -201,8 +203,8 @@ public class TemplateEngine2 {
                     }
                     else {
                         String logicKey = ctx.getLogicKey();
-                        ctx.pushLogic(dataHandler.isLogicalTrue(logicKey));
-                        log.debug("    logic value: " + ctx.isLogicTrue());
+                        ctx.pushLogic(dataHandler.isLogicalTrueOrFalse(logicKey));
+                        log.debug(String.format("    logic expression: %s = %s", logicKey, ctx.isLogicTrue()));
                     }
                 }
                 // 无状态改变
@@ -291,6 +293,7 @@ public class TemplateEngine2 {
 
     /**
      * 直接用 DataModelHandler 渲染模板片段
+     *
      * @param stanza
      * @param dataHandler
      * @return
