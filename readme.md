@@ -176,13 +176,25 @@ SwiftMarker是一个轻量级的模板引擎
 	hello github
 	```
 
-	* logic condition judgement for object types:
+	* Logic condition judgement for object types:
 
 Logic|String|Number|Boolean|Date|Calendar|JsonPrimitive|Collection|JsonArray|Map|JsonObject|Array
 -|-|-|-|-|-|-|-|-|-|-|-
 Logic true|Y/y/YES/yes/Yes/non-empty text|>0|true|>0|>0|true/>0|size()>0|size()>0|size()>0|size()>0|length>0
 Logic false|N/n/NO/no/No/empty text|<=0|true|=0|=0|true/<=0|size()=0|size()=0|size()=0|size()=0|length=0
 
+	* Use "!" in logic expression to perfrom logic negation, for example:
+	```
+	?{!foo.bar}
+	?{}
+	```
+	
+	```
+	$[collection]
+	?{!.foo.bar}
+	?{}
+	$[]
+	```
 
 
 * Other supported data model object types
@@ -245,7 +257,7 @@ outputLineBreaker|line breaker of output|\\n
 <dependency>
 	<groupId>com.github.swiftech</groupId>
 	<artifactId>swiftmarker</artifactId>
-	<version>2.0-BETA3</version>
+	<version>2.0-BETA4</version>
 </dependency>
 ```
 
