@@ -238,7 +238,7 @@ Logic false|N/n/NO/no/No/empty text|<=0|true|=0|=0|true/<=0|size()=0|size()=0|si
 	...
 	SwiftMarker swiftMarker = new SwiftMarker();
 	Config config = new Config();
-	config.setDebug(true);
+	log.setLevel(Logger.LEVEL_DEBUG);
     swiftMarker.prepare(strTemplate, config);
 	...
 	```
@@ -250,6 +250,7 @@ name|description|default
 debug|true to output debug logs|false
 inputLineBreaker|line breaker of input|\\n
 outputLineBreaker|line breaker of output|\\n
+renderExpressionIfValueIsBlank| set false to avoid render expression if no value provided | true
 
 ### Maven
 
@@ -257,7 +258,7 @@ outputLineBreaker|line breaker of output|\\n
 <dependency>
 	<groupId>com.github.swiftech</groupId>
 	<artifactId>swiftmarker</artifactId>
-	<version>2.0-BETA4</version>
+	<version>2.0</version>
 </dependency>
 ```
 
