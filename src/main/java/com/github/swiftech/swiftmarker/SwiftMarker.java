@@ -38,7 +38,7 @@ public class SwiftMarker {
             throw new RuntimeException("Template required");
         }
         if (config != null) {
-            Logger.getInstance().setEnabled(config.isDebug());
+            Logger.getInstance().setLevel(config.getDebugLevel());
             templateEngine.setConfig(config);
         }
         templateEngine.setTemplate(template);
@@ -62,6 +62,19 @@ public class SwiftMarker {
      * @return
      */
     public String render(Object dataModel) {
-        return this.templateEngine.process(new StackDataModelHandler(dataModel));
+        ProcessContext processContext = new ProcessContext();
+        String process = this.templateEngine.process(dataModel, processContext);
+        processContext.printAllMessages();
+        return process;
+    }
+
+    /**
+     * Render the template by data model object with the global process context
+     * @param dataModel
+     * @param processContext
+     * @return
+     */
+    public String render(Object dataModel, ProcessContext processContext) {
+        return this.templateEngine.process(dataModel, processContext);
     }
 }

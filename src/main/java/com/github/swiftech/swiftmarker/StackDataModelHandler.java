@@ -3,8 +3,8 @@ package com.github.swiftech.swiftmarker;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.lang3.StringUtils;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.*;
 
@@ -21,16 +21,29 @@ public class StackDataModelHandler implements DataModelHandler {
     // 根数据模型（即全局的数据模型）
     private Object rootDataModel;
 
-    public StackDataModelHandler(Object container) {
-        this(container, container);
+    private ProcessContext processContext;
+
+
+    /**
+     * @param container
+     * @param processContext
+     */
+    public StackDataModelHandler(Object container, ProcessContext processContext) {
+        this(container, container, processContext);
     }
 
-    public StackDataModelHandler(Object container, Object rootDataModel) {
+    /**
+     * @param container
+     * @param rootDataModel
+     * @param processContext
+     */
+    public StackDataModelHandler(Object container, Object rootDataModel, ProcessContext processContext) {
         if (container.getClass().isPrimitive()) {
             throw new IllegalArgumentException("DataModel can not be primitive");
         }
+        this.processContext = processContext;
         this.dataModelStack.push(container);
-        this.dataModelHelper = new DataModelHelper();
+        this.dataModelHelper = new DataModelHelper(processContext);
         this.rootDataModel = rootDataModel;
     }
 
@@ -108,7 +121,7 @@ public class StackDataModelHandler implements DataModelHandler {
 
     @Override
     public boolean isLogicalTrue(Object container, String key) {
-        throw new NotImplementedException();
+        throw new NotImplementedException("Not implemented yet");
     }
 
     @Override
@@ -150,9 +163,11 @@ public class StackDataModelHandler implements DataModelHandler {
     public LoopMatrix onLoop(String loopKey) {
         List<Map<String, Object>> ret = new ArrayList<>();
 
+        // 只能用 Iterable， 因为可能返回各种对象
         Iterable dataMatrix = dataModelHelper.getValueRecursively(getTopDataModel(), loopKey, Iterable.class);
-        if (dataMatrix == null) {
+        if (dataMatrix == null || !dataMatrix.iterator().hasNext()) {
             Logger.getInstance().warn("No collection or key-value object in the data model by key: " + loopKey);
+            processContext.addMessageToCurrentGroup("No collection or key-value object in the data model by key: " + loopKey);
             return new LoopMatrix(ret);
         }
 

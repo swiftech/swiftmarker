@@ -14,6 +14,15 @@ import java.util.*;
 public class DataModelHelper {
 
     /**
+     * 处理上下文
+     */
+    protected ProcessContext processContext;
+
+    public DataModelHelper(ProcessContext processContext) {
+        this.processContext = processContext;
+    }
+
+    /**
      * 递归从数据模型容器中获取key对应的值。如果是数组对象，会转换成集合（Iterable）
      *
      * @param container
@@ -68,9 +77,14 @@ public class DataModelHelper {
         }
     }
 
-    private Object getAsIs(Object o) {
-        if (o instanceof JsonPrimitive) {
-            JsonPrimitive jp = (JsonPrimitive) o;
+    /**
+     * 返回值对象本来类型的对象
+     * @param val
+     * @return
+     */
+    private Object getAsIs(Object val) {
+        if (val instanceof JsonPrimitive) {
+            JsonPrimitive jp = (JsonPrimitive) val;
             if (jp.isString()) {
                 return jp.getAsString();
             }
@@ -85,7 +99,7 @@ public class DataModelHelper {
             }
         }
         else {
-            return o.toString();
+            return val.toString();
         }
     }
 

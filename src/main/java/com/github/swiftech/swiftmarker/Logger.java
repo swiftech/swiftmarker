@@ -8,9 +8,14 @@ package com.github.swiftech.swiftmarker;
  **/
 public class Logger {
 
+    public static final int LEVEL_DEBUG = 10;
+    public static final int LEVEL_INFO = 20;
+    public static final int LEVEL_WARN = 30;
+    public static final int LEVEL_ERROR = 40;
+
     private static Logger ins = new Logger();
 
-    private boolean isEnabled = false;
+    private int level = LEVEL_DEBUG;
 
     private Logger() {
     }
@@ -19,32 +24,40 @@ public class Logger {
         return ins;
     }
 
-    public boolean isEnabled() {
-        return isEnabled;
+    public int getLevel() {
+        return level;
     }
 
-    public void setEnabled(boolean enabled) {
-        isEnabled = enabled;
+    public void setLevel(int level) {
+        this.level = level;
     }
 
     public void error(String msg) {
-        System.out.printf("[SwiftMarker]   [ERR] %s%n", msg);
+        if (level <= LEVEL_ERROR) {
+            System.out.printf("[SwiftMarker]   [ERR] %s%n", msg);
+        }
     }
 
     public void warn(String msg) {
-        System.out.printf("[SwiftMarker]  [WARN] %s%n", msg);
+        if (level <= LEVEL_WARN) {
+            System.out.printf("[SwiftMarker]  [WARN] %s%n", msg);
+        }
     }
 
     public void info(String msg) {
-        System.out.printf("[SwiftMarker]  [INFO] %s%n", msg);
+        if (level <= LEVEL_INFO) {
+            System.out.printf("[SwiftMarker]  [INFO] %s%n", msg);
+        }
     }
 
     public void debug(String msg) {
-        if (isEnabled) System.out.printf("[SwiftMarker] [DEBUG] %s%n", msg);
+        if (level <= LEVEL_DEBUG) {
+            System.out.printf("[SwiftMarker] [DEBUG] %s%n", msg);
+        }
     }
 
     public void data(String data) {
-        if (isEnabled) {
+        if (level == LEVEL_DEBUG) {
             System.out.println("--------------------------------");
             System.out.println(data);
             System.out.println("--------------------------------");

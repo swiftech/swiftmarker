@@ -58,13 +58,25 @@ public class TemplateEngine2 {
     /**
      * 执行模板渲染处理
      *
-     * @param dataHandler
+     * @param dataModel
      * @return
      */
-    public String process(DataModelHandler dataHandler) {
+    public String process(Object dataModel, ProcessContext processContext) {
+        return this.process(dataModel, dataModel, processContext);
+    }
+
+    /**
+     * 执行模板渲染处理
+     *
+     * @param dataModel
+     * @return
+     */
+    public String process(Object dataModel, Object rootDataModel, ProcessContext processContext) {
         if (StringUtils.isBlank(template)) {
             throw new RuntimeException("Template not loaded");
         }
+
+        StackDataModelHandler dataHandler = new StackDataModelHandler(dataModel, rootDataModel, processContext);
 
         log.info("====  Template Engine Start to Process  ====");
         log.info("Config: ");
@@ -121,7 +133,9 @@ public class TemplateEngine2 {
                             // 暂时解决一行中多个逻辑表达式的方法，以后要重构
                             TemplateEngine2 subEngine = new TemplateEngine2();
                             subEngine.setTemplate(post);
-                            String rendered = subEngine.process(new StackDataModelHandler(dataHandler.getTopDataModel(), dataHandler.getRootDataModel()));
+                            subEngine.setConfig(this.config);
+                            String rendered = subEngine.process(
+                                    dataHandler.getTopDataModel(), dataHandler.getRootDataModel(), processContext);
                             ctx.appendToBuffer(rendered);
                         }
                         else {
@@ -153,7 +167,8 @@ public class TemplateEngine2 {
                     if (ctx.isOutLoop()) {
                         log.debug("    end in line");
                         String subTemplate = StringUtils.substringBetween(line, "$[" + loopKey + "]", "$[]");
-                        String rendered = processLoop(subTemplate, loopMatrix, dataHandler.getRootDataModel());
+                        String rendered =
+                                processLoop(subTemplate, loopMatrix, dataHandler.getRootDataModel(), processContext);
                         ctx.appendToBuffer(rendered);//.append(config.getOutputLineBreaker());
                         ctx.popLoopState();
                         dataHandler.popDataModel();
@@ -190,7 +205,8 @@ public class TemplateEngine2 {
                         String rendered = processLoop(
                                 stanzaBuf.toString(),
                                 (LoopMatrix) dataHandler.getTopDataModel(),
-                                dataHandler.getRootDataModel());
+                                rootDataModel,
+                                processContext);
                         ctx.appendToBuffer(rendered);
                         ctx.popLoopState();
                         dataHandler.popDataModel();
@@ -209,12 +225,12 @@ public class TemplateEngine2 {
                 }
                 // 无状态改变
                 else {
-                    log.debug("    ...");
                     if (ctx.isInLoop()) {
-                        log.debug("    in loop");
+                        log.debug("    in loop, render while loop out");
                         ctx.appendToBuffer(line).append(config.getOutputLineBreaker());
                     }
                     else {
+                        log.debug("    process general expressions");
                         processGeneralExpressions(line, true, dataHandler, ctx);
                     }
 //                    continue;// 等待下一行一起处理
@@ -238,20 +254,24 @@ public class TemplateEngine2 {
      * @param rootDataModel  根数据模型，用于处理循环内的全局表达式
      * @return
      */
-    private String processLoop(String templateStanza, LoopMatrix loopMatrix, Object rootDataModel) {
+    private String processLoop(String templateStanza, LoopMatrix loopMatrix, Object rootDataModel,
+                               ProcessContext processContext) {
         if (StringUtils.isBlank(templateStanza)) {
             throw new RuntimeException("Template stanza is empty");
         }
         StringBuilder outBuf = new StringBuilder();
         if (loopMatrix == null || loopMatrix.getMatrix().isEmpty()) {
+            log.debug("    output template stanza directly");
             // 没有提供参数值，直接输出模板(TODO 如果模板中存在全局变量则有问题）
             outBuf.append(templateStanza);//.append(config.getOutputLineBreaker());
         }
         else {
+            log.debug("    recursively render sub template:");
             TemplateEngine2 subEngine = new TemplateEngine2();
+            subEngine.setConfig(this.config);
             for (Map<String, Object> matrix : loopMatrix.getMatrix()) {
                 subEngine.setTemplate(templateStanza);
-                String rendered = subEngine.process(new StackDataModelHandler(matrix, rootDataModel));
+                String rendered = subEngine.process(matrix, rootDataModel, processContext);
                 outBuf.append(rendered);
             }
         }
@@ -275,7 +295,7 @@ public class TemplateEngine2 {
         String[] keys = StringUtils.substringsBetween(stanza, "${", "}");
         // 没有参数，原样不动的返回一行
         if (keys == null || keys.length == 0) {
-            log.warn("    No place holders for this line.");
+            log.debug("    No place holders for this line.");
             ctx.appendToBuffer(stanza);
             if (isEndOfLine) ctx.appendToBuffer(config.getOutputLineBreaker());
         }
@@ -301,13 +321,13 @@ public class TemplateEngine2 {
     private String replaceKeys(String stanza, DataModelHandler dataHandler) {
         String[] keys = StringUtils.substringsBetween(stanza, "${", "}");
         if (keys == null || keys.length == 0) {
-            log.warn("    No place holders for this line.");
+            log.debug("    No place holders for this line.");
             return stanza;
         }
-        log.info(String.format("    String params: [ %s ]", StringUtils.join(keys, ", ")));
+        log.info(String.format("    Param keys: [ %s ]", TextUtils.join(keys, ", ")));
         List<String> values = dataHandler.onKeys(keys);
-        log.info(String.format("    Values: [ %s ]", StringUtils.join(values, ", ")));
-        String rendered = TextUtils.replaceWith(stanza, keys, values.toArray(new String[0]));
+        log.info(String.format("    Values: [ %s ]", TextUtils.join(values, ", ")));
+        String rendered = TextUtils.replaceWith(stanza, keys, values.toArray(new String[0]), config.isRenderExpressionIfValueIsBlank());
         log.info("    Render: ");
         log.data(rendered);
         return rendered;
