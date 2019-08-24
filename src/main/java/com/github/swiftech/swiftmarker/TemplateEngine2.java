@@ -118,6 +118,10 @@ public class TemplateEngine2 {
                 }
                 else {
                     if (ctx.isStartLogic()) {
+                        if (ctx.isLogicFalse()) {
+                            log.debug("  skip for logic false");
+                            continue;
+                        }
                         log.info("    found entering logic");
                         String logicKey = ctx.getLogicKey();
                         String expLogicStart = "?{" + logicKey + "}";
@@ -126,9 +130,9 @@ public class TemplateEngine2 {
                         ctx.pushLogic(dataHandler.isLogicalTrueOrFalse(logicKey));
                         log.debug(String.format("    logic expression: %s = %s", logicKey, ctx.isLogicTrue()));
                         if (ctx.isLogicTrue()) {
+                            //
                             String raw = StringUtils.substringBetween(line, expLogicStart, Constants.EXP_LOGIC_END);
-                            String retLine = replaceKeys(raw, dataHandler);
-                            ctx.appendToBuffer(retLine);
+                            ctx.appendToBuffer(replaceKeys(raw, dataHandler));
                         }
                         ctx.popLogicState();
                         String post = StringUtils.substringAfter(line, Constants.EXP_LOGIC_END);
@@ -151,8 +155,10 @@ public class TemplateEngine2 {
                     }
                 }
             }
+            // 不是逻辑出
             else {
                 if (ctx.isLogicFalse()) {
+                    log.debug("  skip for logic false");
                     continue;
                 }
 
