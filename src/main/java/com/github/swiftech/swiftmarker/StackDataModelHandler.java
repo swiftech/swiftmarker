@@ -125,6 +125,12 @@ public class StackDataModelHandler implements DataModelHandler {
     }
 
     @Override
+    public boolean isInEmptyLoop() {
+        return getTopDataModel() instanceof LoopMatrix
+                && ((LoopMatrix) getTopDataModel()).getMatrix().isEmpty();
+    }
+
+    @Override
     public List<String> onKeys(String[] keys) {
         List<String> ret = new ArrayList<>();
         for (String key : keys) {

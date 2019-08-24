@@ -53,6 +53,10 @@ public class RenderContext {
         return null;
     }
 
+    /**
+     * 判断是否处于逻辑退出（包含逻辑退出标记）
+     * @return
+     */
     public boolean isOutLogic() {
         if (StringUtils.contains(line, Constants.EXP_LOGIC_END)) {
             return true;
@@ -156,6 +160,7 @@ public class RenderContext {
     }
 
     /**
+     * 将字符串追加到堆栈顶的 buffer 中
      * @param s
      * @return
      */
@@ -169,6 +174,8 @@ public class RenderContext {
     }
 
     /**
+     * 获取堆栈顶的 buffer
+     *
      * @return
      */
     public StringBuilder getBuffer() {

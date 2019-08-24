@@ -109,6 +109,10 @@ public class TemplateEngine2 {
             // 先判断逻辑退出，因为需要实现逻辑表达式内嵌套其他表达式
             if (ctx.isOutLogic()) {
                 log.info("    found quitting logic");
+                // 存在数据才渲染；没有数据，忽略渲染
+                if (dataHandler.isInEmptyLoop()) {
+                    continue;
+                }
                 if (ctx.isInLoop()) {
                     ctx.appendToBuffer(line).append(config.getOutputLineBreaker());
                 }
@@ -151,6 +155,7 @@ public class TemplateEngine2 {
                 if (ctx.isLogicFalse()) {
                     continue;
                 }
+
                 // 处理循环表达式开始
                 if (ctx.isStartLoop()) {
                     log.info("    entering loop...");
@@ -159,6 +164,11 @@ public class TemplateEngine2 {
 
                     LoopMatrix loopMatrix = dataHandler.onLoop(loopKey);
                     dataHandler.pushDataModel(loopMatrix);
+                    if (dataHandler.isInEmptyLoop()) {
+                        ctx.createBuffer(); // 此处创建buffer只是为了避免后续处理抛出异常 TODO
+//                        ctx.appendToBuffer(line).append(config.getOutputLineBreaker());
+                        continue;
+                    }
 
                     String pre = StringUtils.substringBefore(line, "$[" + loopKey + "]");
                     processGeneralExpressions(pre, false, dataHandler, ctx);
@@ -202,18 +212,26 @@ public class TemplateEngine2 {
                     }
 
                     if (ctx.isInLoop()) {
-                        String rendered = processLoop(
-                                stanzaBuf.toString(),
-                                (LoopMatrix) dataHandler.getTopDataModel(),
-                                rootDataModel,
-                                processContext);
-                        ctx.appendToBuffer(rendered);
+                        // 存在数据才渲染；没有数据，忽略渲染
+                        if (!dataHandler.isInEmptyLoop()) {
+                            String rendered = this.processLoop(
+                                    stanzaBuf.toString(),
+                                    (LoopMatrix) dataHandler.getTopDataModel(),
+                                    rootDataModel,
+                                    processContext);
+                            log.debug("    clear loop");
+                            ctx.appendToBuffer(rendered);
+                        }
                         ctx.popLoopState();
                         dataHandler.popDataModel();
                     }
                 }
                 else if (ctx.isStartLogic()) {
                     log.info("    entering logic");
+                    // 存在数据才渲染；没有数据，忽略渲染
+                    if (dataHandler.isInEmptyLoop()) {
+                        continue;
+                    }
                     if (ctx.isInLoop()) {
                         ctx.appendToBuffer(line).append(config.getInputLineBreaker());
                     }
@@ -225,6 +243,10 @@ public class TemplateEngine2 {
                 }
                 // 无状态改变
                 else {
+                    // 存在数据才渲染；没有数据，忽略渲染
+                    if (dataHandler.isInEmptyLoop()) {
+                        continue;
+                    }
                     if (ctx.isInLoop()) {
                         log.debug("    in loop, render while loop out");
                         ctx.appendToBuffer(line).append(config.getOutputLineBreaker());
@@ -257,7 +279,7 @@ public class TemplateEngine2 {
     private String processLoop(String templateStanza, LoopMatrix loopMatrix, Object rootDataModel,
                                ProcessContext processContext) {
         if (StringUtils.isBlank(templateStanza)) {
-            throw new RuntimeException("Template stanza is empty");
+            throw new RuntimeException("Template stanza is blank");
         }
         StringBuilder outBuf = new StringBuilder();
         if (loopMatrix == null || loopMatrix.getMatrix().isEmpty()) {
@@ -279,7 +301,7 @@ public class TemplateEngine2 {
     }
 
     /**
-     * 处理模板片段的渲染
+     * 处理模板片段的渲染，并加入到渲染缓存中
      *
      * @param stanza
      * @param dataHandler

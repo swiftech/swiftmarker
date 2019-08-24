@@ -32,6 +32,13 @@ public interface DataModelHandler {
     boolean isLogicalTrue(Object container, String key);
 
     /**
+     * 当前是否处于空的循环中（栈顶的 LoopMatrix 为空）
+     *
+     * @return
+     */
+    boolean isInEmptyLoop();
+
+    /**
      * 处理一段字符串中所有的表达式 key
      *
      * @param keys

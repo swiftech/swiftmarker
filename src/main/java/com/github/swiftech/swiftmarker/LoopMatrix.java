@@ -5,6 +5,7 @@ import java.util.Map;
 
 /**
  * 循环矩阵
+ *
  * @author Allen 2018-12-07
  **/
 public class LoopMatrix {
