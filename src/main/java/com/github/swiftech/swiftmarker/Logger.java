@@ -2,7 +2,7 @@ package com.github.swiftech.swiftmarker;
 
 /**
  * 日志处理，用 enable 来控制是否输出
- * TODO: 日志回调交给调用方去处理日志。
+ * 可以设置日志回调交给调用方去处理日志。
  *
  * @author swiftech 2018-11-29
  **/
@@ -14,6 +14,8 @@ public class Logger {
     public static final int LEVEL_ERROR = 40;
 
     private static Logger ins = new Logger();
+
+    private LoggerListener loggerListener;
 
     private int level = LEVEL_DEBUG;
 
@@ -32,27 +34,52 @@ public class Logger {
         this.level = level;
     }
 
+    public void setLoggerListener(LoggerListener loggerListener) {
+        this.loggerListener = loggerListener;
+    }
+
     public void error(String msg) {
         if (level <= LEVEL_ERROR) {
-            System.out.printf("[SwiftMarker]   [ERR] %s%n", msg);
+            if (loggerListener == null) {
+                System.out.printf("[SwiftMarker]   [ERR] %s%n", msg);
+            }
+            else {
+
+                loggerListener.onError(String.format("[SwiftMarker] %s", msg));
+            }
         }
     }
 
     public void warn(String msg) {
         if (level <= LEVEL_WARN) {
-            System.out.printf("[SwiftMarker]  [WARN] %s%n", msg);
+            if (loggerListener == null) {
+                System.out.printf("[SwiftMarker]  [WARN] %s%n", msg);
+            }
+            else {
+                loggerListener.onWarn(String.format("[SwiftMarker] %s", msg));
+            }
         }
     }
 
     public void info(String msg) {
         if (level <= LEVEL_INFO) {
-            System.out.printf("[SwiftMarker]  [INFO] %s%n", msg);
+            if (loggerListener == null) {
+                System.out.printf("[SwiftMarker]  [INFO] %s%n", msg);
+            }
+            else {
+                loggerListener.onInfo(String.format("[SwiftMarker] %s", msg));
+            }
         }
     }
 
     public void debug(String msg) {
         if (level <= LEVEL_DEBUG) {
-            System.out.printf("[SwiftMarker] [DEBUG] %s%n", msg);
+            if (loggerListener == null) {
+                System.out.printf("[SwiftMarker] [DEBUG] %s%n", msg);
+            }
+            else {
+                loggerListener.onDebug(String.format("[SwiftMarker] %s", msg));
+            }
         }
     }
 
