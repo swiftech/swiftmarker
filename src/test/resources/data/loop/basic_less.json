@@ -1,0 +1,15 @@
+{
+  "question": {
+	"title": "What's your favorite color?",
+	"options": [
+	  {
+		"index": "A",
+		"option": "Red"
+	  },
+	  {
+		"index": "B",
+		"option": "Green"
+	  }
+	]
+  }
+}

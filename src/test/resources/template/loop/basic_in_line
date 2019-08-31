@@ -1,0 +1,5 @@
+循环开始
+${question.title}
+${question.title} -> $[question.options]${.index}: ${.option}$[]
+
+循环结束

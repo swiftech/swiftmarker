@@ -1,0 +1,15 @@
+复杂逻辑开始
+${question.title}
+?{show.options}
+$[question.options]
+${.index} :
+  ${.option}
+?{selected}
+    (O)
+?{}
+$[]
+
+${question.end}
+?{}
+
+复杂逻辑结束

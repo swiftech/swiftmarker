@@ -1,0 +1,57 @@
+{
+  "show_note": "Y",
+  "corporations": [
+	{
+	  "name": "Google",
+	  "selected": 1,
+	  "note": "do evil",
+	  "directors": [
+		{
+		  "name" : "Pichai"
+		},
+		{
+		  "name" : "Kanchai"
+		}
+	  ]
+	},
+	{
+	  "name": "Facebook",
+	  "selected": true,
+	  "note": "big brother is watching u",
+	  "directors": [
+		{
+		  "name" : "张三"
+		},
+		{
+		  "name" : "李四"
+		}
+	  ]
+	},
+	{
+	  "name": "Alibaba",
+	  "selected": false,
+	  "note": "no no no",
+	  "directors": [
+		{
+		  "name" : "Jack"
+		},
+		{
+		  "name" : "Cowboy"
+		}
+	  ]
+	},
+	{
+	  "name": "",
+	  "selected": true,
+	  "note": "anonymous",
+	  "director": [
+		{
+		  "name" : "Peter"
+		},
+		{
+		  "name" : "Nick"
+		}
+	  ]
+	}
+  ]
+}

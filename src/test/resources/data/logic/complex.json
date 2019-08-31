@@ -1,0 +1,14 @@
+{
+  "show": {
+    "options": true
+  },
+  "question": {
+      "title": "What's your favorite color?",
+      "end": "hahaha",
+      "options": [
+          {"index": "A", "option": "Red", "selected": 1},
+          {"index": "B", "option": "Green"},
+          {"index": "C", "option": "Blue"}
+      ]
+  }
+}

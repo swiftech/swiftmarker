@@ -1,0 +1,9 @@
+行内逻辑判断测试开始
+->?{a.show}"${a.hello}"?{}<-
+->?{b.show}"${b.hello}"?{}<-
+->${c.hello}?{c.show}"${c.show}"?{}<-
+->?{a.show}"${a.hello}"?{}  ?{b.show}"${b.hello}"?{}<-
+?{c.show}
+${c.hello}
+?{}
+行内逻辑判断测试结束

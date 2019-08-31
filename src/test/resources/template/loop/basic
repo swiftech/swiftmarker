@@ -1,0 +1,6 @@
+${question.title}
+$[question.options]
+	${.index}: ${.option}
+$[]
+
+the end

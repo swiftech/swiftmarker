@@ -1,0 +1,6 @@
+${question.title}
+$[question.options]
+	${.index}${question.separator} ${.option}
+$[]
+
+循环结束

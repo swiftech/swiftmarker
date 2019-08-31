@@ -16,14 +16,24 @@ SwiftMarker是一个轻量级的模板引擎
 * Logic expression
 
 ### Dependencies
-* java 1.7
+* java 1.7+
 * commons-lang3 3.7+
 * gson 2.8+
 
+### Release Update
+* 2019-08-24 v2.1
+	* if no data selected in loop expression, nothing will be output.
+	* fix the logic expression handle bug.
+
+* 2019-05-01 v2.0
+    * rebuild the template engine
+
+* 2018-11-09 v1.0 beta
+    * initial release.
+
 ### Tutorial
 
-
-* Intialize
+##### Intialize
 	```java
 	String strTemplate = "......";
 	com.google.gson.JsonObject model = ...;
@@ -32,7 +42,7 @@ SwiftMarker是一个轻量级的模板引擎
 	String result = swiftMarker.render(model);
 	```
 
-* Basic
+##### Basic Usage
 
 	Use ```${}``` to select params from data model.
 
@@ -59,6 +69,9 @@ SwiftMarker是一个轻量级的模板引擎
 	anger leads to hate,
 	hate leads to suffering.
 	```
+
+###### Loop
+Use ```$[var]...$[]``` pair to select elements in data model and loop them. If no any elements selected, anything between them will not be rendered.
 
 * loop expression with key-value elements
 
@@ -139,7 +152,7 @@ SwiftMarker是一个轻量级的模板引擎
 	C: Blue
 	```
 
-
+##### Logic
 * Logic Expression
 	Logic expression is used to decide whether or not display content in it, you can have any layer nesting logic expression. Only the expression condition determined to logic true
 
@@ -188,7 +201,7 @@ Logic false|N/n/NO/no/No/empty text|<=0|true|=0|=0|true/<=0|size()=0|size()=0|si
 	?{!foo.bar}
 	?{}
 	```
-	
+
 	```
 	$[collection]
 	?{!.foo.bar}
@@ -231,7 +244,7 @@ Logic false|N/n/NO/no/No/empty text|<=0|true|=0|=0|true/<=0|size()=0|size()=0|si
 > Of course, you can have all these data objects nested in any way.
 
 
-* Config
+##### Config
 
 	* You can customize SwiftMarker by provide a ```Config``` object to it.
 	```java
@@ -258,7 +271,7 @@ renderExpressionIfValueIsBlank| set false to avoid render expression if no value
 <dependency>
 	<groupId>com.github.swiftech</groupId>
 	<artifactId>swiftmarker</artifactId>
-	<version>2.0</version>
+	<version>2.1</version>
 </dependency>
 ```
 

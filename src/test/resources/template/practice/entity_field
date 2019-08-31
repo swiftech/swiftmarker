@@ -1,0 +1,11 @@
+?{fields}
+$[fields]
+    /**
+     * ${.description}?{.notes} (${.notes})?{}
+     */
+    @PropertyDescription(value = "${.description}"?{.notes}, notes = "${.notes}"?{}?{.example}, example = "${.example}"?{})
+    @Column(name = "${.name}"?{.length_exp}${.length_exp}?{}?{.unique}, unique = true?{}?{.not_null}, nullable = false?{}, columnDefinition = "${.db_type} ?{.unique}UNIQUE ?{}?{.not_null}NOT NULL ?{}?{.default_value}DEFAULT ${.default_value} ?{}COMMENT '${.description}?{.notes}(${.notes})?{}'")
+    private ${.type} ${.name_camel_lower}?{.default_value_java} = ${.default_value_java}?{};
+
+$[]
+?{}

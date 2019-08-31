@@ -1,0 +1,21 @@
+{
+  "empty": [],
+  "question": {
+	"title": "What's your favorite color?",
+	"separator": "：",
+	"options": [
+	  {
+		"index": "A",
+		"option": "Red"
+	  },
+	  {
+		"index": "B",
+		"option": "Green"
+	  },
+	  {
+		"index": "C",
+		"option": "Blue"
+	  }
+	]
+  }
+}

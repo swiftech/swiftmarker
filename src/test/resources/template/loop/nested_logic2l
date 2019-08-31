@@ -1,0 +1,13 @@
+****
+
+$[corporations]
+?{.selected}
+?{.name}
+名称：${.name}
+?{}
+${.note}
+?{}
+
+$[]
+
+****

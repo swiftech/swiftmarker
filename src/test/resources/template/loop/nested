@@ -1,0 +1,8 @@
+$[corporations]
+	姓名：${.name}
+	$[.directors]
+		${.name}
+	$[]
+$[]
+
+循环结束

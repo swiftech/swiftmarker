@@ -1,0 +1,11 @@
+****
+
+$[corporations]
+----
+?{.name}
+name: ${.name}
+?{}
+note: ${.note}
+----
+$[]
+****

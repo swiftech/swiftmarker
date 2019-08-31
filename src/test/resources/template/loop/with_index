@@ -1,0 +1,4 @@
+${question.title}
+$[question.options]
+	${.0}: ${.1}
+$[]
