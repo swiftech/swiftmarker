@@ -16,7 +16,7 @@ public class BaseResourceTest {
 
     protected Config config = new Config();
     protected Logger log = Logger.getInstance();
-    protected TemplateEngine2 engine = new TemplateEngine2();
+    protected TemplateEngine engine = new TemplateEngine();
     protected ProcessContext processContext;
 
     /**

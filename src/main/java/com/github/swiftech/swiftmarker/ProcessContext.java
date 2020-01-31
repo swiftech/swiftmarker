@@ -5,6 +5,9 @@ import com.github.swiftech.swiftmarker.model.TextMessage;
 import com.github.swiftech.swiftmarker.model.MessageGroup;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.LinkedList;
+import java.util.List;
+
 /**
  * 全局处理上下文
  * 功能：
@@ -19,9 +22,20 @@ public class ProcessContext {
     /**
      * 分组名称 -> 信息集合
      */
-    private MessageGroup rootMessage = new MessageGroup("");
+    private MessageGroup rootGroup = new MessageGroup(StringUtils.EMPTY);
     // 指向当前的分组，适用于某些变量域内没有分组名的情况
-    private MessageGroup currentGroup = rootMessage;
+    private MessageGroup currentGroup = rootGroup;
+
+    /**
+     * 添加信息至根分组
+     *
+     * @param message
+     */
+    public void addMessageToRootGroup(String message) {
+        if (rootGroup != null) {
+            rootGroup.addMessage(message);
+        }
+    }
 
     /**
      * 添加信息至当前（最后一个）分组
@@ -35,7 +49,7 @@ public class ProcessContext {
     }
 
     /**
-     * 添加一个分组
+     * 按照"."分隔的组名添加一个分组
      *
      * @param groupPattern 用点分隔的
      */
@@ -48,13 +62,14 @@ public class ProcessContext {
     }
 
     private MessageGroup getCreateGroup(String groupPattern) {
-        MessageGroup groupFound = modelHelper.getValueRecursively(rootMessage, groupPattern, MessageGroup.class);
+        MessageGroup groupFound = modelHelper.getValueRecursively(rootGroup, groupPattern, MessageGroup.class);
         if (groupFound == null) {
             if (!groupPattern.contains(".")) {
                 // 已经是最后一个节点了
-                groupFound = new MessageGroup(rootMessage.getLevel() + 1, groupPattern);
-                rootMessage.put(groupPattern, groupFound);
-                rootMessage.getMessages().add(groupFound);// 同时要放到列表中
+                groupFound = new MessageGroup(rootGroup.getLevel() + 1, groupPattern);
+                rootGroup.put(groupPattern, groupFound);
+                rootGroup.getMessages().add(groupFound);// 同时要放到列表中
+                groupFound.setParentGroup(rootGroup);
             }
             else {
                 String parentPattern = StringUtils.substringBeforeLast(groupPattern, ".");
@@ -63,6 +78,7 @@ public class ProcessContext {
                 groupFound = new MessageGroup(parentGroup.getLevel() + 1, groupName);
                 parentGroup.put(groupName, groupFound);
                 parentGroup.getMessages().add(groupFound); // 同时要放到列表中
+                groupFound.setParentGroup(parentGroup);
             }
         }
         return groupFound;
@@ -86,29 +102,36 @@ public class ProcessContext {
      * 格式化输出所有消息至标准输入输出
      */
     public void printAllMessages() {
-        System.out.println("========= Results ========  ");
-        this.visit(rootMessage, new Visitor<Message>() {
+        System.out.println("========= Processing Results ========  ");
+        this.visit(rootGroup, new Visitor<Message>() {
             @Override
             public void consume(Message message) {
                 StringBuilder output = new StringBuilder();
                 if (message instanceof TextMessage) {
-                    output.append(StringUtils.repeat(" ", (message.getLevel()-1) * 2))
+                    output.append(StringUtils.repeat(" ", (message.getLevel() - 1) * 2))
                             .append("|- ")
                             .append(((TextMessage) message).getContent());
                 }
                 else if (message instanceof MessageGroup) {
-                    output.append(StringUtils.repeat(" ", (message.getLevel()-1) * 2))
+                    output.append(StringUtils.repeat(" ", (message.getLevel() - 1) * 2))
                             .append("|- ")
                             .append(((MessageGroup) message).getGroupName());
                 }
                 System.out.println(output.toString());
             }
         });
-        System.out.println("========= Results ========  ");
+        System.out.println("========= Processing Results ========  ");
     }
 
-    public void visit(MessageGroup node, Visitor<Message> visitor) {
-
+    /**
+     * 递归访问消息树，深度优先
+     *
+     * @param node
+     * @param visitor
+     * @return
+     */
+    public List<TextMessage> visit(MessageGroup node, Visitor<Message> visitor) {
+        List<TextMessage> ret = new LinkedList<>();
         for (Message message : node.getMessages()) {
             if (message == null) {
                 continue;
@@ -117,17 +140,19 @@ public class ProcessContext {
                 visitor.consume(message);
             }
             else if (message instanceof MessageGroup) {
-                visitor.consume(message);
+                if (((MessageGroup) message).getTotalCount() > 0) {
+                    visitor.consume(message);
+                }
                 this.visit((MessageGroup) message, visitor);
             }
             else {
                 throw new RuntimeException("Not supported message type");
             }
         }
+        return ret;
     }
 
     public interface Visitor<T> {
-        //        void visit(String key, T t);
         void consume(T t);
     }
 

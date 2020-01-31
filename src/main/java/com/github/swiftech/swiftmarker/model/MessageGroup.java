@@ -13,6 +13,11 @@ public class MessageGroup extends HashMap<String, MessageGroup> implements Messa
     private int level = 0; // root level is 0
 
     /**
+     * 消息总数（含所有层级）
+     */
+    private int totalCount = 0;
+
+    /**
      * 消息组名称　
      */
     private String groupName;
@@ -21,6 +26,8 @@ public class MessageGroup extends HashMap<String, MessageGroup> implements Messa
      * 消息列表
      */
     private List<Message> messages = new LinkedList<>();
+
+    private MessageGroup parentGroup;
 
     public MessageGroup(String groupName) {
         this.groupName = groupName;
@@ -41,6 +48,14 @@ public class MessageGroup extends HashMap<String, MessageGroup> implements Messa
         this.level = level;
     }
 
+    public int getTotalCount() {
+        return totalCount;
+    }
+
+    public void setTotalCount(int totalCount) {
+        this.totalCount = totalCount;
+    }
+
     public String getGroupName() {
         return groupName;
     }
@@ -57,8 +72,27 @@ public class MessageGroup extends HashMap<String, MessageGroup> implements Messa
         this.messages = messages;
     }
 
+    public MessageGroup getParentGroup() {
+        return parentGroup;
+    }
+
+    public void setParentGroup(MessageGroup parentGroup) {
+        this.parentGroup = parentGroup;
+    }
+
     public void addMessage(String msg) {
         this.messages.add(new TextMessage(this.level + 1, msg));
+        this.increase();
+    }
+
+    /**
+     * 递增自己的计数并递归向上更新父分组的计数
+     */
+    protected void increase() {
+        totalCount++;
+        if (parentGroup !=null) {
+            parentGroup.increase();
+        }
     }
 
 

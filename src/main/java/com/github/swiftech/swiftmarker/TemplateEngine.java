@@ -35,7 +35,7 @@ import java.util.Map;
  *
  * @author swiftech
  */
-public class TemplateEngine2 {
+public class TemplateEngine {
 
     private Logger log = Logger.getInstance();
 
@@ -43,14 +43,14 @@ public class TemplateEngine2 {
 
     private Config config = new Config();
 
-    public TemplateEngine2() {
+    public TemplateEngine() {
     }
 
-    public TemplateEngine2(String template) {
+    public TemplateEngine(String template) {
         this.template = template;
     }
 
-    public TemplateEngine2(String template, Config config) {
+    public TemplateEngine(String template, Config config) {
         this.template = template;
         this.config = config;
     }
@@ -139,7 +139,7 @@ public class TemplateEngine2 {
 
                         if (StringUtils.contains(post, "?{")) {
                             // 暂时解决一行中多个逻辑表达式的方法，以后要重构
-                            TemplateEngine2 subEngine = new TemplateEngine2();
+                            TemplateEngine subEngine = new TemplateEngine();
                             subEngine.setTemplate(post);
                             subEngine.setConfig(this.config);
                             String rendered = subEngine.process(
@@ -295,7 +295,7 @@ public class TemplateEngine2 {
         }
         else {
             log.debug("    recursively render sub template:");
-            TemplateEngine2 subEngine = new TemplateEngine2();
+            TemplateEngine subEngine = new TemplateEngine();
             subEngine.setConfig(this.config);
             for (Map<String, Object> matrix : loopMatrix.getMatrix()) {
                 subEngine.setTemplate(templateStanza);

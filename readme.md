@@ -21,6 +21,11 @@ SwiftMarker是一个轻量级的模板引擎
 * gson 2.8+
 
 ### Release Update
+* 2020-01-31 v2.2
+    * upgrade dependencies.
+    * make the processing messages more readable.
+    * refactor.
+    
 * 2019-08-24 v2.1
 	* if no data selected in loop expression, nothing will be output.
 	* fix the logic expression handle bug.

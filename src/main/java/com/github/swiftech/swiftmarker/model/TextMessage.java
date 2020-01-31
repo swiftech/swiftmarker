@@ -9,6 +9,8 @@ public class TextMessage implements Message {
 
     String content;
 
+    private MessageGroup parentGroup;
+
     public TextMessage() {
     }
 
@@ -45,5 +47,13 @@ public class TextMessage implements Message {
     @Override
     public void setLevel(int level) {
         this.level = level;
+    }
+
+    public MessageGroup getParentGroup() {
+        return parentGroup;
+    }
+
+    public void setParentGroup(MessageGroup parentGroup) {
+        this.parentGroup = parentGroup;
     }
 }

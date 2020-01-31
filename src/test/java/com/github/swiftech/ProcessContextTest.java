@@ -14,17 +14,17 @@ public class ProcessContextTest {
     @Test
     public void testProcessMessages() {
         ProcessContext ctx = new ProcessContext();
-        ctx.addMessageToCurrentGroup("Standalone message start");
+        ctx.addMessageToRootGroup("Standalone message start");
 
-
+        ctx.addMessageToRootGroup("Message in current group");
         // Level 1
         ctx.addGroup("level1A.level2A");
         ctx.addMessageToCurrentGroup("message 1a.2a.1");
-        ctx.addGroupMessage("level1A.level2B", "message 1a.2a.2");
+        ctx.addGroupMessage("level1A.level2B", "message 1a.2b.2");
 
         ctx.addGroup("level1B");
 
-        ctx.addMessageToCurrentGroup("Standalone message end");
+        ctx.addMessageToRootGroup("Standalone message end");
 
         ctx.printAllMessages();
     }
@@ -35,12 +35,16 @@ public class ProcessContextTest {
         ProcessContext processContext = new ProcessContext();
         //
         processContext.addGroup("A");
-        processContext.addMessageToCurrentGroup("A - addMessageToCurrentGroup");
+        processContext.addMessageToCurrentGroup("A_1 (addMessageToCurrentGroup)");
 
         //
         processContext.addGroup("B");
-        processContext.addGroupMessage("A", "A - addGroupMessage");
-        processContext.addMessageToCurrentGroup("B - addMessageToCurrentGroup");
+        processContext.addGroupMessage("A", "A_2 (addGroupMessage)");
+        processContext.addMessageToCurrentGroup("B_1 (addMessageToCurrentGroup)");
+
+        processContext.addGroup("C");
+        processContext.addGroup("C.c");
+        processContext.addMessageToCurrentGroup("C_1 (addMessageToCurrentGroup)");
 
         processContext.printAllMessages();
     }
