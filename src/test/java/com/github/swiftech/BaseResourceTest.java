@@ -1,9 +1,6 @@
 package com.github.swiftech;
 
-import com.github.swiftech.swiftmarker.Config;
-import com.github.swiftech.swiftmarker.Logger;
-import com.github.swiftech.swiftmarker.ProcessContext;
-import com.github.swiftech.swiftmarker.TemplateEngine2;
+import com.github.swiftech.swiftmarker.*;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import org.apache.commons.io.IOUtils;
@@ -20,6 +17,7 @@ public class BaseResourceTest {
     protected Config config = new Config();
     protected Logger log = Logger.getInstance();
     protected TemplateEngine2 engine = new TemplateEngine2();
+    protected ProcessContext processContext;
 
     /**
      * 所有名称都一致
@@ -74,8 +72,15 @@ public class BaseResourceTest {
         String json = this.loadJsonData(dataResName);
         log.data(json);
         JsonObject jsonObject = new Gson().fromJson(json, JsonObject.class);
-        ProcessContext processContext = new ProcessContext();
-        String process = engine.process(jsonObject, processContext);
+//        ProcessContext processContext = new ProcessContext();
+//        String process = engine.process(jsonObject, processContext);
+//        processContext.printAllMessages();
+        return this.processWithContext(jsonObject);
+    }
+
+    public String processWithContext(Object data) {
+        processContext = new ProcessContext();
+        String process = engine.process(data, processContext);
         processContext.printAllMessages();
         return process;
     }

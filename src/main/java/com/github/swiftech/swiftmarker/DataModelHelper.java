@@ -16,17 +16,17 @@ public class DataModelHelper {
     /**
      * 处理上下文
      */
-    protected ProcessContext processContext;
-
-    public DataModelHelper(ProcessContext processContext) {
-        this.processContext = processContext;
-    }
+//    protected ProcessContext2 processContext;
+//
+//    public DataModelHelper(ProcessContext2 processContext) {
+//        this.processContext = processContext;
+//    }
 
     /**
-     * 递归从数据模型容器中获取key对应的值。如果是数组对象，会转换成集合（Iterable）
+     * 递归从数据模型容器中获取 key 对应的值。如果是数组对象，会转换成集合（Iterable）
      *
      * @param container
-     * @param key
+     * @param key 形如 'foo.bar' 的字符串
      * @param retType
      * @param <T>
      * @return

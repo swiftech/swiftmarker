@@ -1,7 +1,6 @@
 package com.github.swiftech;
 
 import com.github.swiftech.swiftmarker.DataModelHelper;
-import com.github.swiftech.swiftmarker.ProcessContext;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import org.junit.Assert;
@@ -19,7 +18,7 @@ public class DataModelHelperTest {
         jo2.add("k12", new JsonPrimitive("v12"));
         jo1.add("k1", jo2);
 
-        DataModelHelper dataModelHelper = new DataModelHelper(new ProcessContext());
+        DataModelHelper dataModelHelper = new DataModelHelper();
         String s = dataModelHelper.getValueRecursively(jo1, "k1.k12", String.class);
         System.out.println("结果：" + s);
         Assert.assertEquals("v12", s);

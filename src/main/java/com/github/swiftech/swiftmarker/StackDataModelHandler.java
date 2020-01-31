@@ -43,7 +43,7 @@ public class StackDataModelHandler implements DataModelHandler {
         }
         this.processContext = processContext;
         this.dataModelStack.push(container);
-        this.dataModelHelper = new DataModelHelper(processContext);
+        this.dataModelHelper = new DataModelHelper();
         this.rootDataModel = rootDataModel;
     }
 

@@ -12,24 +12,8 @@ import org.junit.Test;
 public class TestContext extends BaseResourceTest {
 
     @Test
-    public void testContext() {
-        ProcessContext processContext = new ProcessContext();
-        //
-        processContext.addGroup("A");
-        processContext.addMessageToCurrentGroup("A - addMessageToCurrentGroup");
-
-        //
-        processContext.addGroup("B");
-        processContext.addGroupMessage("A", "A - addGroupMessage");
-        processContext.addMessageToCurrentGroup("B - addMessageToCurrentGroup");
-
-        processContext.printAllMessages();
-    }
-
-    @Test
     public void testWithProcessing() {
         ProcessContext processContext = new ProcessContext();
-
         {
             //
             processContext.addGroup("simple/basic");

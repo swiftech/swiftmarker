@@ -16,8 +16,8 @@ SwiftMarker是一个轻量级的模板引擎
 * Logic expression
 
 ### Dependencies
-* java 1.7+
-* commons-lang3 3.7+
+* java 1.8+
+* commons-lang3 3.9+
 * gson 2.8+
 
 ### Release Update
@@ -271,7 +271,7 @@ renderExpressionIfValueIsBlank| set false to avoid render expression if no value
 <dependency>
 	<groupId>com.github.swiftech</groupId>
 	<artifactId>swiftmarker</artifactId>
-	<version>2.1</version>
+	<version>2.2</version>
 </dependency>
 ```
 
