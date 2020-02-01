@@ -5,9 +5,9 @@ package com.github.swiftech.swiftmarker.model;
  */
 public class TextMessage implements Message {
 
-    int level;
+    private int level;
 
-    String content;
+    private String content;
 
     private MessageGroup parentGroup;
 

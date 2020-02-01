@@ -5,10 +5,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- *
  * @author swiftech
  */
-public class MessageGroup extends HashMap<String, MessageGroup> implements Message{
+public class MessageGroup extends HashMap<String, MessageGroup> implements Message {
 
     private int level = 0; // root level is 0
 
@@ -18,7 +17,12 @@ public class MessageGroup extends HashMap<String, MessageGroup> implements Messa
     private int totalCount = 0;
 
     /**
-     * 消息组名称　
+     * 强制显示
+     */
+    private boolean mandatory;
+
+    /**
+     * 消息组名称
      */
     private String groupName;
 
@@ -56,6 +60,17 @@ public class MessageGroup extends HashMap<String, MessageGroup> implements Messa
         this.totalCount = totalCount;
     }
 
+    public boolean isMandatory() {
+        return mandatory;
+    }
+
+    public void setMandatory(boolean mandatory) {
+        this.mandatory = mandatory;
+        if (parentGroup != null) {
+            parentGroup.setMandatory(mandatory);
+        }
+    }
+
     public String getGroupName() {
         return groupName;
     }
@@ -90,7 +105,7 @@ public class MessageGroup extends HashMap<String, MessageGroup> implements Messa
      */
     protected void increase() {
         totalCount++;
-        if (parentGroup !=null) {
+        if (parentGroup != null) {
             parentGroup.increase();
         }
     }

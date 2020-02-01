@@ -32,21 +32,29 @@ public class ProcessContextTest {
 
     @Test
     public void testContext() {
-        ProcessContext processContext = new ProcessContext();
+        ProcessContext ctx = new ProcessContext();
         //
-        processContext.addGroup("A");
-        processContext.addMessageToCurrentGroup("A_1 (addMessageToCurrentGroup)");
+        ctx.addGroup("A");
+        ctx.addMessageToCurrentGroup("A_1 (addMessageToCurrentGroup)");
 
         //
-        processContext.addGroup("B");
-        processContext.addGroupMessage("A", "A_2 (addGroupMessage)");
-        processContext.addMessageToCurrentGroup("B_1 (addMessageToCurrentGroup)");
+        ctx.addGroup("B");
+        ctx.addGroupMessage("A", "A_2 (addGroupMessage)");
+        ctx.addMessageToCurrentGroup("B_1 (addMessageToCurrentGroup)");
 
-        processContext.addGroup("C");
-        processContext.addGroup("C.c");
-        processContext.addMessageToCurrentGroup("C_1 (addMessageToCurrentGroup)");
+        ctx.addGroup("C");
+        ctx.addGroup("C.c");
+        ctx.addMessageToCurrentGroup("C_2 (addMessageToCurrentGroup)");
+        ctx.addGroupToCurrentGroup("cc");
+        ctx.addMessageToCurrentGroup("C_3_(addMessageToCurrentGroup)");
 
-        processContext.printAllMessages();
+        ctx.addGroup("D");
+        ctx.addGroup("D.d").setMandatory(true);
+
+        ctx.addGroup("E");
+        ctx.addGroup("E.e");
+
+        ctx.printAllMessages();
     }
 
 }

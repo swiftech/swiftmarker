@@ -1,5 +1,6 @@
 package com.github.swiftech.swiftmarker;
 
+import com.github.swiftech.swiftmarker.model.GroupPattern;
 import com.github.swiftech.swiftmarker.model.Message;
 import com.github.swiftech.swiftmarker.model.TextMessage;
 import com.github.swiftech.swiftmarker.model.MessageGroup;
@@ -53,12 +54,43 @@ public class ProcessContext {
      *
      * @param groupPattern 用点分隔的
      */
-    public void addGroup(String groupPattern) {
+    public MessageGroup addGroup(String groupPattern) {
         try {
             currentGroup = getCreateGroup(groupPattern);
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return currentGroup;
+    }
+
+    /**
+     * 添加一个新的分组至当前的分组中，并把当前分组指向新分组
+     *
+     * @param groupName
+     * @return
+     */
+    public MessageGroup addGroupToCurrentGroup(String groupName) {
+        MessageGroup newGroup = new MessageGroup(currentGroup.getLevel() + 1, groupName);
+        currentGroup.put(groupName, newGroup);
+        currentGroup.getMessages().add(newGroup); // 同时要放到列表中
+        newGroup.setParentGroup(currentGroup);
+        currentGroup = newGroup;
+        return newGroup;
+    }
+
+    /**
+     *
+     * @param groupName
+     * @return
+     */
+    public MessageGroup addGroupAsSibling(String groupName) {
+        MessageGroup parentGroup = currentGroup.getParentGroup();
+        MessageGroup newGroup = new MessageGroup(parentGroup.getLevel() + 1, groupName);
+        parentGroup.put(groupName, newGroup);
+        parentGroup.getMessages().add(newGroup); // 同时要放到列表中
+        newGroup.setParentGroup(parentGroup);
+        currentGroup = newGroup;
+        return newGroup;
     }
 
     private MessageGroup getCreateGroup(String groupPattern) {
@@ -72,11 +104,10 @@ public class ProcessContext {
                 groupFound.setParentGroup(rootGroup);
             }
             else {
-                String parentPattern = StringUtils.substringBeforeLast(groupPattern, ".");
-                String groupName = StringUtils.substringAfterLast(groupPattern, ".");
-                MessageGroup parentGroup = this.getCreateGroup(parentPattern); // Recursive
-                groupFound = new MessageGroup(parentGroup.getLevel() + 1, groupName);
-                parentGroup.put(groupName, groupFound);
+                GroupPattern gp = new GroupPattern(groupPattern);
+                MessageGroup parentGroup = this.getCreateGroup(gp.getParentPattern()); // Recursive
+                groupFound = new MessageGroup(parentGroup.getLevel() + 1, gp.getGroupName());
+                parentGroup.put(gp.getGroupName(), groupFound);
                 parentGroup.getMessages().add(groupFound); // 同时要放到列表中
                 groupFound.setParentGroup(parentGroup);
             }
@@ -140,10 +171,11 @@ public class ProcessContext {
                 visitor.consume(message);
             }
             else if (message instanceof MessageGroup) {
-                if (((MessageGroup) message).getTotalCount() > 0) {
+                if (((MessageGroup) message).getTotalCount() > 0
+                        || ((MessageGroup) message).isMandatory()) {
                     visitor.consume(message);
                 }
-                this.visit((MessageGroup) message, visitor);
+                this.visit((MessageGroup) message, visitor); // recursive to next level
             }
             else {
                 throw new RuntimeException("Not supported message type");
