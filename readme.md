@@ -22,6 +22,7 @@ SwiftMarker是一个轻量级的模板引擎
 
 ### Release Update
 * 2020-01-31 v2.2
+    * upgrade java to 1.8
     * upgrade dependencies.
     * make the processing messages more readable.
     * refactor.
