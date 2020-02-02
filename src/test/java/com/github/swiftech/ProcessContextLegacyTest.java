@@ -1,6 +1,6 @@
 package com.github.swiftech;
 
-import com.github.swiftech.swiftmarker.ProcessContext2;
+import com.github.swiftech.swiftmarker.ProcessContextLegacy;
 import org.junit.Test;
 
 /**
@@ -10,7 +10,7 @@ public class ProcessContextLegacyTest {
 
     @Test
     public void testit() {
-        ProcessContext2 ctx = new ProcessContext2();
+        ProcessContextLegacy ctx = new ProcessContextLegacy();
         ctx.addMessage("Standalone message start");
 
 
