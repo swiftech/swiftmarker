@@ -40,41 +40,42 @@ SwiftMarker是一个轻量级的模板引擎
 ### Tutorial
 
 ##### Intialize
-	```java
-	String strTemplate = "......";
-	com.google.gson.JsonObject model = ...;
-	SwiftMarker swiftMarker = new SwiftMarker();
-	swiftMarker.prepare(strTemplate);
-	String result = swiftMarker.render(model);
-	```
+
+```java
+String strTemplate = "......";
+com.google.gson.JsonObject model = ...;
+SwiftMarker swiftMarker = new SwiftMarker();
+swiftMarker.prepare(strTemplate);
+String result = swiftMarker.render(model);
+```
 
 ##### Basic Usage
 
-	Use ```${}``` to select params from data model.
+Use ```${}``` to select params from data model.
 
-	* Template
-	```
-	Fear leads to ${yoda.word1},
-	${yoda.word1} leads to ${yoda.word2},
-	${yoda.word2} leads to suffering.
-	```
+* Template
+```
+Fear leads to ${yoda.word1},
+${yoda.word1} leads to ${yoda.word2},
+${yoda.word2} leads to suffering.
+```
 
-	* Data Model
-	```javascript
-	{
-		"yoda": {
-			"word1": "anger",
-			"word2": "hate"
-		}
-	}
-	```
+* Data Model
+```javascript
+{
+    "yoda": {
+        "word1": "anger",
+        "word2": "hate"
+    }
+}
+```
 
-	* Result
-	```
-	Fear leads to anger,
-	anger leads to hate,
-	hate leads to suffering.
-	```
+* Result
+```
+Fear leads to anger,
+anger leads to hate,
+hate leads to suffering.
+```
 
 ###### Loop
 Use ```$[var]...$[]``` pair to select elements in data model and loop them. If no any elements selected, anything between them will not be rendered.
@@ -202,18 +203,18 @@ Logic|String|Number|Boolean|Date|Calendar|JsonPrimitive|Collection|JsonArray|Map
 Logic true|Y/y/YES/yes/Yes/non-empty text|>0|true|>0|>0|true/>0|size()>0|size()>0|size()>0|size()>0|length>0
 Logic false|N/n/NO/no/No/empty text|<=0|true|=0|=0|true/<=0|size()=0|size()=0|size()=0|size()=0|length=0
 
-	* Use "!" in logic expression to perfrom logic negation, for example:
-	```
-	?{!foo.bar}
-	?{}
-	```
+* Use "!" in logic expression to perfrom logic negation, for example:
+```
+?{!foo.bar}
+?{}
+```
 
-	```
-	$[collection]
-	?{!.foo.bar}
-	?{}
-	$[]
-	```
+```
+$[collection]
+?{!.foo.bar}
+?{}
+$[]
+```
 
 
 * Other supported data model object types
@@ -252,17 +253,17 @@ Logic false|N/n/NO/no/No/empty text|<=0|true|=0|=0|true/<=0|size()=0|size()=0|si
 
 ##### Config
 
-	* You can customize SwiftMarker by provide a ```Config``` object to it.
-	```java
-	...
-	SwiftMarker swiftMarker = new SwiftMarker();
-	Config config = new Config();
-	log.setLevel(Logger.LEVEL_DEBUG);
-    swiftMarker.prepare(strTemplate, config);
-	...
-	```
+* You can customize SwiftMarker by provide a ```Config``` object to it.
+```java
+...
+SwiftMarker swiftMarker = new SwiftMarker();
+Config config = new Config();
+log.setLevel(Logger.LEVEL_DEBUG);
+swiftMarker.prepare(strTemplate, config);
+...
+```
 
-	* Options to config SwiftMarker:
+* Options to config SwiftMarker:
 
 name|description|default
 -|-|-
