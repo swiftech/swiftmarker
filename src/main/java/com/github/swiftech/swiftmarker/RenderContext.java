@@ -12,16 +12,16 @@ import java.util.Stack;
 public class RenderContext {
 
     // 逻辑表达式堆栈
-    private Stack<String> logicKeyStack = new Stack<>();
+    private final Stack<String> logicKeyStack = new Stack<>();
 
     // 循环表达式堆栈
-    private Stack<String> loopKeyStack = new Stack<>();
+    private final Stack<String> loopKeyStack = new Stack<>();
 
     // 状态堆栈
-    private Stack<State> stateStack = new Stack<>();
+    private final Stack<State> stateStack = new Stack<>();
 
     // 渲染缓存堆栈
-    private Stack<StringBuilder> renderBufStack = new Stack<>();
+    private final Stack<StringBuilder> renderBufStack = new Stack<>();
 
     // 当前行
     private String line;
@@ -121,10 +121,7 @@ public class RenderContext {
      * @return
      */
     public boolean isOutLoop() {
-        if (StringUtils.contains(line.trim(), Constants.EXP_LOOP_END)) {
-            return true;
-        }
-        return false;
+        return StringUtils.contains(line.trim(), Constants.EXP_LOOP_END);
     }
 
     public void popLoopState() {
@@ -198,13 +195,14 @@ public class RenderContext {
 
     /**
      * 删除文本缓存中指定位置区间的字符
+     *
      * @param startInclusive
      * @param endExclusive
      * @return
      */
     private StringBuilder deleteInBuffer(int startInclusive, int endExclusive) {
         StringBuilder buf = renderBufStack.peek();
-        if (buf == null) {
+        if (buf == null || buf.length() == 0) {
             throw new IllegalStateException("Render buffer is empty");
         }
         buf.delete(startInclusive, endExclusive);

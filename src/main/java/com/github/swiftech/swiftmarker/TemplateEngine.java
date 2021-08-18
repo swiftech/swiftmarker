@@ -18,6 +18,7 @@ package com.github.swiftech.swiftmarker;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -37,7 +38,7 @@ import java.util.Map;
  */
 public class TemplateEngine {
 
-    private Logger log = Logger.getInstance();
+    private final Logger log = Logger.getInstance();
 
     private String template;
 
@@ -108,7 +109,7 @@ public class TemplateEngine {
 
             // 先判断逻辑退出，因为需要实现逻辑表达式内嵌套其他表达式
             if (ctx.isOutLogic()) {
-                log.info("    found quitting logic");
+                log.debug("    found quitting logic");
                 // 存在数据才渲染；没有数据，忽略渲染
                 if (dataHandler.isInEmptyLoop()) {
                     continue;
@@ -119,16 +120,16 @@ public class TemplateEngine {
                 else {
                     if (ctx.isStartLogic()) {
                         if (ctx.isLogicFalse()) {
-                            log.debug("  skip for logic false");
+                            log.trace("  skip for logic false");
                             continue;
                         }
-                        log.info("    found entering logic");
+                        log.debug("    found entering logic");
                         String logicKey = ctx.getLogicKey();
                         String expLogicStart = "?{" + logicKey + "}";
                         String pre = StringUtils.substringBefore(line, expLogicStart);
                         processGeneralExpressions(pre, false, dataHandler, ctx);
                         ctx.pushLogic(dataHandler.isLogicalTrueOrFalse(logicKey));
-                        log.debug(String.format("    logic expression: %s = %s", logicKey, ctx.isLogicTrue()));
+                        log.trace(String.format("    logic expression: %s = %s", logicKey, ctx.isLogicTrue()));
                         if (ctx.isLogicTrue()) {
                             //
                             String raw = StringUtils.substringBetween(line, expLogicStart, Constants.EXP_LOGIC_END);
@@ -158,15 +159,15 @@ public class TemplateEngine {
             // 不是逻辑出
             else {
                 if (ctx.isLogicFalse()) {
-                    log.debug("  skip for logic false");
+                    log.trace("  skip for logic false");
                     continue;
                 }
 
                 // 处理循环表达式开始
                 if (ctx.isStartLoop()) {
-                    log.info("    entering loop...");
+                    log.debug("    entering loop...");
                     String loopKey = ctx.getLoopKey();
-                    log.debug("    loop key: " + loopKey);
+                    log.trace("    loop key: " + loopKey);
 
                     LoopMatrix loopMatrix = dataHandler.onLoop(loopKey);
                     dataHandler.pushDataModel(loopMatrix);
@@ -181,7 +182,7 @@ public class TemplateEngine {
 
                     // 直接结束了(inline)
                     if (ctx.isOutLoop()) {
-                        log.debug("    end in line");
+                        log.trace("    end in line");
                         String subTemplate = StringUtils.substringBetween(line, "$[" + loopKey + "]", "$[]");
                         String rendered =
                                 processLoop(subTemplate, loopMatrix, dataHandler.getRootDataModel(), processContext);
@@ -195,7 +196,7 @@ public class TemplateEngine {
                     else {
                         ctx.createBuffer(); // 新开一个渲染缓存?，貌似不需要，循环内部因为递归调用了引擎，其内部会初始化这个缓存的
                         String stanza = StringUtils.substringAfter(line, "$[" + loopKey + "]");
-                        log.debug("    continue lines");
+                        log.trace("    continue lines");
                         if (StringUtils.isBlank(stanza.trim())) {
                             // 循环表达式头单独出现，这一行不需要作为模板处理
                             continue;
@@ -208,7 +209,7 @@ public class TemplateEngine {
                 }
                 // 处理循环表达式结尾
                 else if (ctx.isOutLoop()) {
-                    log.debug("    end loop");
+                    log.trace("    end loop");
                     StringBuilder stanzaBuf = ctx.popBuffer();
                     if (ctx.isWholeLineLoopEnd()) {
                         // 单独的数组尾，这一行不需要作为模板处理
@@ -225,7 +226,7 @@ public class TemplateEngine {
                                     (LoopMatrix) dataHandler.getTopDataModel(),
                                     rootDataModel,
                                     processContext);
-                            log.debug("    clear loop");
+                            log.trace("    clear loop");
                             ctx.appendToBuffer(rendered);
                         }
                         ctx.popLoopState();
@@ -233,7 +234,7 @@ public class TemplateEngine {
                     }
                 }
                 else if (ctx.isStartLogic()) {
-                    log.info("    entering logic");
+                    log.debug("    entering logic");
                     // 存在数据才渲染；没有数据，忽略渲染
                     if (dataHandler.isInEmptyLoop()) {
                         continue;
@@ -244,7 +245,7 @@ public class TemplateEngine {
                     else {
                         String logicKey = ctx.getLogicKey();
                         ctx.pushLogic(dataHandler.isLogicalTrueOrFalse(logicKey));
-                        log.debug(String.format("    logic expression: %s = %s", logicKey, ctx.isLogicTrue()));
+                        log.trace(String.format("    logic expression: %s = %s", logicKey, ctx.isLogicTrue()));
                     }
                 }
                 // 无状态改变
@@ -254,11 +255,11 @@ public class TemplateEngine {
                         continue;
                     }
                     if (ctx.isInLoop()) {
-                        log.debug("    in loop, render while loop out");
+                        log.trace("    in loop, render while loop out");
                         ctx.appendToBuffer(line).append(config.getOutputLineBreaker());
                     }
                     else {
-                        log.debug("    process general expressions");
+                        log.trace("    process general expressions");
                         processGeneralExpressions(line, true, dataHandler, ctx);
                     }
 //                    continue;// 等待下一行一起处理
@@ -266,8 +267,8 @@ public class TemplateEngine {
 
                 // 特殊处理文末
                 if (i == lines.length - 1) {
-                    log.info("reach to the end");
-                    ctx.trimTail(config);
+                    log.debug("reach to the end");
+                    ctx.trimTail(config); //如果模版为空或者只有标签，则会报错 TODO
                 }
             }
         }
@@ -323,18 +324,30 @@ public class TemplateEngine {
         String[] keys = StringUtils.substringsBetween(stanza, "${", "}");
         // 没有参数，原样不动的返回一行
         if (keys == null || keys.length == 0) {
-            log.debug("    No place holders for this line.");
+            log.trace("    No place holders for this line.");
             ctx.appendToBuffer(stanza);
             if (isEndOfLine) ctx.appendToBuffer(config.getOutputLineBreaker());
         }
         else {
-            if (ctx.isLogicFalse()) {
-                return;
-            }
-            else {
-                String rendered = replaceKeys(stanza, dataHandler);
+            // 这个地方特殊处理一下转义符的情况（注意只能存在一层，否则会报错，而且中间不能有空格）
+            boolean containsStarter = Arrays.stream(keys).anyMatch(s -> s.contains("${"));
+            if (containsStarter) {
+                String stub = StringUtils.substringAfter(keys[0], "${");
+                String rendered = StringUtils.replace(stanza,
+                        String.format("${${%s}}", stub),
+                        String.format("${%s}", stub));
                 ctx.appendToBuffer(rendered);
                 if (isEndOfLine) ctx.appendToBuffer(config.getOutputLineBreaker());
+            }
+            else {
+                if (ctx.isLogicFalse()) {
+                    return;
+                }
+                else {
+                    String rendered = replaceKeys(stanza, dataHandler);
+                    ctx.appendToBuffer(rendered);
+                    if (isEndOfLine) ctx.appendToBuffer(config.getOutputLineBreaker());
+                }
             }
         }
     }
@@ -352,11 +365,11 @@ public class TemplateEngine {
             log.debug("    No place holders for this line.");
             return stanza;
         }
-        log.info(String.format("    Param keys: [ %s ]", TextUtils.join(keys, ", ")));
+        log.trace(String.format("    Param keys: [ %s ]", TextUtils.join(keys, ", ")));
         List<String> values = dataHandler.onKeys(keys);
-        log.info(String.format("    Values: [ %s ]", TextUtils.join(values, ", ")));
+        log.trace(String.format("    Values: [ %s ]", TextUtils.join(values, ", ")));
         String rendered = TextUtils.replaceWith(stanza, keys, values.toArray(new String[0]), config.isRenderExpressionIfValueIsBlank());
-        log.info("    Render: ");
+        log.trace("    Render: ");
         log.data(rendered);
         return rendered;
     }

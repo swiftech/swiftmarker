@@ -13,6 +13,7 @@ import java.util.List;
  * 全局处理上下文
  * 功能：
  * 信息收集
+ * (JSON 格式不能排序，不能混合数据结构，所以必须自定义数据结构）
  *
  * @author swiftech 2020-01
  **/

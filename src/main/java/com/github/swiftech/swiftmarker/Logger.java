@@ -7,13 +7,13 @@ package com.github.swiftech.swiftmarker;
  * @author swiftech 2018-11-29
  **/
 public class Logger {
+    public static final int LEVEL_TRACE = 10;
+    public static final int LEVEL_DEBUG = 20;
+    public static final int LEVEL_INFO = 30;
+    public static final int LEVEL_WARN = 40;
+    public static final int LEVEL_ERROR = 50;
 
-    public static final int LEVEL_DEBUG = 10;
-    public static final int LEVEL_INFO = 20;
-    public static final int LEVEL_WARN = 30;
-    public static final int LEVEL_ERROR = 40;
-
-    private static Logger ins = new Logger();
+    private static final Logger ins = new Logger();
 
     private LoggerListener loggerListener;
 
@@ -76,6 +76,17 @@ public class Logger {
         if (level <= LEVEL_DEBUG) {
             if (loggerListener == null) {
                 System.out.printf("[SwiftMarker] [DEBUG] %s%n", msg);
+            }
+            else {
+                loggerListener.onDebug(String.format("[SwiftMarker] %s", msg));
+            }
+        }
+    }
+
+    public void trace(String msg) {
+        if (level <= LEVEL_TRACE) {
+            if (loggerListener == null) {
+                System.out.printf("[SwiftMarker] [TRACE] %s%n", msg);
             }
             else {
                 loggerListener.onDebug(String.format("[SwiftMarker] %s", msg));

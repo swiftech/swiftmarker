@@ -13,15 +13,15 @@ import java.util.*;
  */
 public class StackDataModelHandler implements DataModelHandler {
 
-    private DataModelHelper dataModelHelper;
+    private final DataModelHelper dataModelHelper;
 
     // 循环的数据堆栈
-    private Stack<Object> dataModelStack = new Stack<>();
+    private final Stack<Object> dataModelStack = new Stack<>();
 
     // 根数据模型（即全局的数据模型）
-    private Object rootDataModel;
+    private final Object rootDataModel;
 
-    private ProcessContext processContext;
+    private final ProcessContext processContext;
 
 
     /**

@@ -4,7 +4,7 @@ SwiftMarker is a lightweight template engine.
 
 SwiftMarker是一个轻量级的模板引擎
 
-> This project is published under Apache license, and currently in ***Development***
+> This project is published under Apache license
 
 
 ### Features
@@ -20,22 +20,6 @@ SwiftMarker是一个轻量级的模板引擎
 * commons-lang3 3.9+
 * gson 2.8+
 
-### Release Update
-* 2020-01-31 v2.2
-    * upgrade java to 1.8
-    * upgrade dependencies.
-    * make the processing messages more readable.
-    * refactor.
-    
-* 2019-08-24 v2.1
-	* if no data selected in loop expression, nothing will be output.
-	* fix the logic expression handle bug.
-
-* 2019-05-01 v2.0
-    * rebuild the template engine
-
-* 2018-11-09 v1.0 beta
-    * initial release.
 
 ### Tutorial
 
@@ -82,7 +66,7 @@ Use ```$[var]...$[]``` pair to select elements in data model and loop them. If n
 
 * loop expression with key-value elements
 
-	Use ```$[]``` to select array/JsonArray/List in data model and use ```${}``` to select params in key-value element. To select params in the loop the expression must starts with '.', expression in the loop starts without '.' will select params from the global data model.
+	Use ```$[]``` to select array/JsonArray/List in data model and use ```${}``` to select params in key-value element. To select params in the loop the expression must starts with `.`, expression in the loop starts without `.` will select params from the global data model.
 
 	* Template
 	```
@@ -117,10 +101,10 @@ Use ```$[var]...$[]``` pair to select elements in data model and loop them. If n
 	My choice is: B
 	```
 
-	> Notice: The line only contains the '$[]' place holder will not output a new line.
+	> Notice: The line only contains the '$[]' placeholder will not output a new line.
 
 > Limits:
-> * Only one array/JsonArray/List place holder ```$[]``` is allowed for one line,
+> * Only one array/JsonArray/List placeholder ```$[]``` is allowed for one line,
 
 
 * Loop expression with array/JsonArray/List element
@@ -161,49 +145,50 @@ Use ```$[var]...$[]``` pair to select elements in data model and loop them. If n
 
 ##### Logic
 * Logic Expression
-	Logic expression is used to decide whether or not display content in it, you can have any layer nesting logic expression. Only the expression condition determined to logic true
 
-	* Template:
-	```
-	?{logic1}
-	${say}
-	?{}
-	?{logic2}
-	${think}
-	?{}
+    Logic expression is used to decide whether display content in it, you can have any layer nesting logic expression. Only the expression condition determined to logic true
 
-	?{logic1}
-	${say}
-		?{logic2}
-	${think}
-		?{}
-	?{}
-	```
+    * Template:
+    ```
+    ?{logic1}
+    ${say}
+    ?{}
+    ?{logic2}
+    ${think}
+    ?{}
 
-	* Data Model:
-	```
-	{
-		"logic1": true,
-		"say": "hello github",
-		"logic2": false,
-		"think": "fxxk M$"
-	}
-	```
+    ?{logic1}
+    ${say}
+        ?{logic2}
+    ${think}
+        ?{}
+    ?{}
+    ```
 
-	* Result:
-	```
-	hello github
-	hello github
-	```
+    * Data Model:
+    ```
+    {
+        "logic1": true,
+        "say": "hello github",
+        "logic2": false,
+        "think": "fxxk M$"
+    }
+    ```
 
-	* Logic condition judgement for object types:
+    * Result:
+    ```
+    hello github
+    hello github
+    ```
+
+    * Logic condition judgement for object types:
 
 Logic|String|Number|Boolean|Date|Calendar|JsonPrimitive|Collection|JsonArray|Map|JsonObject|Array
 -|-|-|-|-|-|-|-|-|-|-|-
 Logic true|Y/y/YES/yes/Yes/non-empty text|>0|true|>0|>0|true/>0|size()>0|size()>0|size()>0|size()>0|length>0
 Logic false|N/n/NO/no/No/empty text|<=0|true|=0|=0|true/<=0|size()=0|size()=0|size()=0|size()=0|length=0
 
-* Use "!" in logic expression to perfrom logic negation, for example:
+* Use "!" in logic expression to perform logic negation, for example:
 ```
 ?{!foo.bar}
 ?{}
@@ -282,6 +267,22 @@ renderExpressionIfValueIsBlank| set false to avoid render expression if no value
 </dependency>
 ```
 
+### Release Update
+* 2020-01-31 v2.2
+	* upgrade java to 1.8
+	* upgrade dependencies.
+	* make the processing messages more readable.
+	* refactor.
+
+* 2019-08-24 v2.1
+	* if no data selected in loop expression, nothing will be output.
+	* fix the logic expression handle bug.
+
+* 2019-05-01 v2.0
+	* rebuild the template engine
+
+* 2018-11-09 v1.0 beta
+	* initial release.
 
 ### Limitation
 * You can not have any reserved words in you template text, it will be recognized as expression.

@@ -4,7 +4,7 @@ import static org.apache.commons.lang3.StringUtils.*;
 
 /**
  * 处理按照逗号分隔各级分组名称，例如 "foo.bar"，
- * 名称冲含有 "." 符号，则转义符 '\'，例如 用 "foo\.bar.1\.2'" 表示
+ * 名称中含有 "." 符号，则转义符 '\'，例如 用 "foo\.bar.1\.2'" 表示
  *
  * @author swiftech
  */
