@@ -22,7 +22,6 @@ public class LogicTest extends BaseResourceTest {
     public void testLogicBasicTrue() {
         String s = super.runFromResourceAndAssert("logic/basic");
         log.data(s);
-
     }
 
     /**
@@ -94,7 +93,7 @@ public class LogicTest extends BaseResourceTest {
     }
 
     @Test
-    public void testLigicPractice() {
+    public void testLogicPractice() {
         String s = super.runFromResourceAndAssert("logic/practice");
     }
 

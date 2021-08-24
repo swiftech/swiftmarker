@@ -16,11 +16,15 @@
 package com.github.swiftech.swiftmarker;
 
 
+import com.github.swiftech.swiftmarker.constant.Constants;
+import com.github.swiftech.swiftmarker.template.*;
+import com.github.swiftech.swiftmarker.util.TextUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Stack;
 
 /**
  * 简易模板引擎
@@ -44,6 +48,9 @@ public class TemplateEngine {
 
     private Config config = new Config();
 
+    private List<Directive> directives;// all directives
+    private final RenderContext renderContext = new RenderContext();
+
     public TemplateEngine() {
     }
 
@@ -66,13 +73,206 @@ public class TemplateEngine {
         return this.process(dataModel, dataModel, processContext);
     }
 
+
+    public String process(Object dataModel, Object rootDataModel, ProcessContext processContext) {
+        log.info("Start to prepare template");
+        TemplateParser templateParser = new TemplateParser();
+        this.directives = templateParser.parse(this.toString(), this.template);
+        StackDataModelHandler dataHandler = new StackDataModelHandler(dataModel, rootDataModel, processContext);
+        log.info("Start to process rendering");
+        this.render(0, new Stack<>(), dataHandler, false);
+
+//        if (templateParser.isLastNestedDirectiveAfterLineBreak()) {
+//            renderContext.getBuffer().deleteCharAt(renderContext.getBuffer().length() - 1);
+//        }
+        return renderContext.popBuffer().toString();
+    }
+
+
+    /**
+     * @param directiveCursor
+     * @param directiveStack
+     * @param dataModelHandler
+     * @param isSub            子递归需要在遇到循环结束的时候 break
+     * @return 返回遇到循环结束的时候的指令位置（也就是上一层递归需要跳到哪个指令之后开始执行）
+     */
+    private int render(int directiveCursor, Stack<Directive> directiveStack, StackDataModelHandler dataModelHandler, boolean isSub) {
+        log.debug(String.format("== render from %d ==", directiveCursor));
+        renderContext.createBuffer();
+        // 从给定的指令位置开始
+        for (int i = directiveCursor; i < directives.size(); i++) {
+            // check if logic false or loop available
+            Directive directive = directives.get(i);
+            if (directive instanceof LogicBegin) {
+                log.debug(String.format("[%2d] logic begin ->", i));
+                if (isTopDirectiveAvailable(directiveStack)) {
+                    boolean available = dataModelHandler.isLogicalTrueOrFalse(directive.getValue());
+                    log.debug(available ? "available" : "not available");
+                    ((LogicBegin) directive).setAvailable(available);// TODO
+                    directiveStack.push(directive);
+                    // 处理前面的换行
+                    if (((LogicBegin) directive).isWrappedWithLineBreak()) {
+                        log.debug("trail last line break");
+                        renderContext.trimTailLineBreak();
+                    }
+                }
+                else {
+                    log.debug("###");
+                    printStack(directiveStack);
+                    ((LogicBegin) directive).setAvailable(false);
+                    directiveStack.push(directive);
+                }
+            }
+            else if (directive instanceof LogicEnd) {
+                log.debug(String.format("[%2d] <- logic end", i));
+                Directive last = directiveStack.peek();
+                if (last instanceof LogicBegin) {
+                    LogicEnd logicEnd = (LogicEnd) directive;
+                    logicEnd.setAvailable(((LogicBegin) last).isAvailable());// TODO
+                    directiveStack.pop();
+                    if (logicEnd.isAvailable() && logicEnd.isWrappedWithLineBreak()) {
+                        log.debug("trail last line break");
+                        renderContext.trimTailLineBreak();
+                    }
+                }
+                else {
+                    log.warn("NOT MATCHED DIRECTIVE");
+                    printStack(directiveStack);
+                }
+            }
+            else if (directive instanceof LoopBegin) {
+                log.debug(String.format("[%2d] loop begin ->", i));
+                // 从当前模型中获取集合，将集合元素倒叙压入堆栈
+                if (isTopDirectiveAvailable(directiveStack)) {
+                    log.debug("trail last line break");
+                    renderContext.trimTailLineBreak();// TODO
+                    LoopBegin loopBegin = (LoopBegin) directive;
+                    LoopMatrix loopMatrix = dataModelHandler.onLoop(directive.getValue());
+                    List<Map<String, Object>> matrix = loopMatrix.getMatrix();
+                    if (matrix == null || matrix.isEmpty()) {
+                        loopBegin.setAvailable(false);
+                        directiveStack.push(directive);
+                    }
+                    else {
+                        for (int j = matrix.size() - 1; j >= 0; j--) {
+                            Map<String, Object> subModel = matrix.get(j);
+                            dataModelHandler.pushDataModel(subModel);
+                        }
+                        loopBegin.setAvailable(true);
+                        directiveStack.push(directive);
+                        int consumedAt = i;
+                        for (int j = 0; j < loopMatrix.getMatrix().size(); j++) {
+                            // == 递归 ==
+                            Stack<Directive> subStack = new Stack<>();
+                            subStack.push(directive); // for matching the loop end in sub-func
+                            log.debug(String.format("Call %dth rendering recusively", j));
+                            consumedAt = this.render(i + 1, subStack, dataModelHandler, true); // 重复赋值没关系
+                            String rendered = renderContext.popBuffer().toString();
+                            renderContext.appendToBuffer(rendered);
+                        }
+                        i = consumedAt - 1;// 由于递归消耗掉了指令，跳到循环结束指令继续执行(下一个循环开始会+1)
+                    }
+//                    if (loopBegin.isWrappedWithLineBreak()) {
+//                        log.debug("trail last line break");
+//                        renderContext.trimTailLineBreak();
+//                    }
+                }
+            }
+            else if (directive instanceof LoopEnd) {
+                log.debug(String.format("[%2d] <- loop end", i));
+                LoopEnd loopEnd = (LoopEnd) directive;
+                if (isTopDirectiveLoopBegin(directiveStack)) {
+                    if (isTopDirectiveAvailable(directiveStack)) {
+                        ((LoopEnd) directive).setAvailable(true); // TODO
+                        log.trace("pop last model");
+                        dataModelHandler.popDataModel();
+                    }
+                    directiveStack.pop();
+                    if (loopEnd.isAvailable() && loopEnd.isWrappedWithLineBreak()) {
+                        log.debug("trim last line break");
+                        renderContext.trimTailLineBreak();
+                    }
+                    log.debug(String.format("== render end at %d ==", i));
+                    if (isSub) return i;// 此处告诉上一层到哪个指令是循环结束
+                }
+                else {
+                    log.warn("NOT MATCHED DIRECTIVE");
+                }
+            }
+            else if (directive instanceof Var) {
+                if (isTopDirectiveAvailable(directiveStack)) {
+                    String rendered = dataModelHandler.onKey(directive.getValue());
+                    log.debug(String.format("[%2d] var replacement: %s = '%s'", i, directive.getValue(), rendered));
+                    renderContext.appendToBuffer(rendered);
+                }
+            }
+            else if (directive instanceof Stanza) {
+                if (isTopDirectiveAvailable(directiveStack)) {
+                    Stanza stanza = (Stanza) directive;
+                    if (stanza.getValue() != null) {
+                        log.debug(String.format("[%2d] append stanza --", i));
+                        String export = stanza.getValue();
+//                        Directive previous = directive.getPrevious();
+//                        if (previous instanceof Begin && ((NestableDirective) previous).isAvailable()) {
+//                            log.debug("previous is available begin");
+//                            if (((NestableDirective) previous).isWrappedWithLineBreak()) {
+//                                log.debug("  cut head");
+//                                export = stanza.cutHead();
+//                            }
+//                        }
+                        log.debug(String.format("  '%s'", export));
+                        renderContext.appendToBuffer(export);
+                    }
+                }
+            }
+        }
+
+        return 0;
+    }
+
+    private void printStack(Stack<Directive> directiveStack) {
+        directiveStack.forEach(directive -> System.out.printf("%s(%s),", directive.getClass().getSimpleName(), (directive instanceof NestableDirective ? ((NestableDirective) directive).isAvailable() : "")));
+        System.out.println();
+    }
+
+    /**
+     * @param directiveStack
+     * @return true if not exist
+     */
+    private boolean isTopDirectiveAvailable(Stack<Directive> directiveStack) {
+        if (!directiveStack.isEmpty()) {
+            Directive lastDirective = directiveStack.peek();
+            if (lastDirective instanceof NestableDirective) {
+                return ((NestableDirective) lastDirective).isAvailable();
+            }
+        }
+        return true;
+    }
+
+    private boolean isTopDirectiveLoopBegin(Stack<Directive> directiveStack) {
+        if (!directiveStack.isEmpty()) {
+            Directive lastDirective = directiveStack.peek();
+            return lastDirective instanceof LoopBegin;
+        }
+        return false;
+    }
+
+    private boolean isTopDirectiveLogicBegin(Stack<Directive> directiveStack) {
+        if (!directiveStack.isEmpty()) {
+            Directive lastDirective = directiveStack.peek();
+            return lastDirective instanceof LogicBegin;
+        }
+        return false;
+    }
+
+
     /**
      * 执行模板渲染处理
      *
      * @param dataModel
      * @return
      */
-    public String process(Object dataModel, Object rootDataModel, ProcessContext processContext) {
+    public String process_v1(Object dataModel, Object rootDataModel, ProcessContext processContext) {
         if (StringUtils.isBlank(template)) {
             throw new RuntimeException("Template not loaded");
         }

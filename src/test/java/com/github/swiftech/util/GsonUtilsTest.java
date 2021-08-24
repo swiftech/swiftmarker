@@ -1,6 +1,6 @@
-package com.github.swiftech;
+package com.github.swiftech.util;
 
-import com.github.swiftech.swiftmarker.GsonUtils;
+import com.github.swiftech.swiftmarker.util.GsonUtils;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import org.junit.Test;

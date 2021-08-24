@@ -1,5 +1,6 @@
 package com.github.swiftech.swiftmarker;
 
+import com.github.swiftech.swiftmarker.util.ObjectUtils;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
@@ -128,6 +129,16 @@ public class StackDataModelHandler implements DataModelHandler {
     public boolean isInEmptyLoop() {
         return getTopDataModel() instanceof LoopMatrix
                 && ((LoopMatrix) getTopDataModel()).getMatrix().isEmpty();
+    }
+
+    public String onKey(String key) {
+        Object v = parseValueLocalOrGlobal(key);
+        if (v == null) {
+            return StringUtils.EMPTY;
+        }
+        else {
+            return v.toString();
+        }
     }
 
     @Override

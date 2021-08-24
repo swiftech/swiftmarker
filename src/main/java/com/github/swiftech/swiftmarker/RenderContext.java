@@ -1,5 +1,6 @@
 package com.github.swiftech.swiftmarker;
 
+import com.github.swiftech.swiftmarker.constant.Constants;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Stack;
@@ -55,6 +56,7 @@ public class RenderContext {
 
     /**
      * 判断是否处于逻辑退出（包含逻辑退出标记）
+     *
      * @return
      */
     public boolean isOutLogic() {
@@ -132,6 +134,7 @@ public class RenderContext {
 
     /**
      * 整行都是结尾（去空格）
+     *
      * @return
      */
     public boolean isWholeLineLoopEnd() {
@@ -148,6 +151,7 @@ public class RenderContext {
 
     /**
      * 创建一个新的渲染缓存并推入堆栈
+     *
      * @return
      */
     public StringBuilder createBuffer() {
@@ -158,10 +162,12 @@ public class RenderContext {
 
     /**
      * 将字符串追加到堆栈顶的 buffer 中
+     *
      * @param s
      * @return
      */
     public StringBuilder appendToBuffer(String s) {
+        if (s == null) return null;
         StringBuilder buf = renderBufStack.peek();
         if (buf == null) {
             throw new IllegalStateException("Render buffer is empty");
@@ -183,8 +189,19 @@ public class RenderContext {
         return buf;
     }
 
+    public void trimTailLineBreak() {
+        StringBuilder buf = getBuffer();
+        if (buf == null || buf.length() == 0) {
+            return;
+        }
+        if (buf.charAt(buf.length() - 1) == '\n') {
+            buf.deleteCharAt(buf.length() - 1);
+        }
+    }
+
     /**
      * 删除整个文本的结尾
+     *
      * @param config
      */
     public void trimTail(Config config) {

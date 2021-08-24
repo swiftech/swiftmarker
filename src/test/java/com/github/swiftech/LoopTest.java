@@ -7,10 +7,12 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 /**
@@ -106,9 +108,9 @@ public class LoopTest extends BaseResourceTest {
         rowB.add("option", new JsonPrimitive("Green"));
 
         Object o = new Object() {
-            Object question = new Object() {
-                String title = "What's your favorite color?";
-                Object options = new ArrayList() {
+            final Object question = new Object() {
+                final String title = "What's your favorite color?";
+                final Object options = new ArrayList<Object>() {
                     {
                         add(new HashMap<String, String>() {
                             {
@@ -141,16 +143,11 @@ public class LoopTest extends BaseResourceTest {
         jac.add("Blue");
 
         Object o = new Object() {
-            Object question = new Object() {
-                String title = "What's your favorite color?";
-                Object[] options = new Object[]{
+            final Object question = new Object() {
+                final String title = "What's your favorite color?";
+                final Object[] options = new Object[]{
                         new Object[]{"A", "Red"},
-                        new ArrayList() {
-                            {
-                                add("B");
-                                add("Green");
-                            }
-                        },
+                        Arrays.asList("B", "Green"),
                         new Object[]{"C", "Blue"},
                 };
             };
@@ -174,8 +171,10 @@ public class LoopTest extends BaseResourceTest {
      */
     @Test
     public void testNestedLoop() {
-        String rendered = super.runFromResourceAndAssert("loop/nested");
-        log.data(rendered);
+        Assert.assertThrows(Throwable.class, () -> {
+            String rendered = super.runFromResourceAndAssert("loop/nested");
+            log.data(rendered);
+        });
     }
 
     /**

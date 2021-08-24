@@ -1,4 +1,4 @@
-package com.github.swiftech.swiftmarker;
+package com.github.swiftech.swiftmarker.util;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;

@@ -3,12 +3,14 @@ package com.github.swiftech;
 import com.github.swiftech.swiftmarker.ProcessContext;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import org.junit.Assert;
 import org.junit.Test;
+import org.junit.function.ThrowingRunnable;
 
 /**
  * @author Allen 2018-12-25
  **/
-public class LoopWrongTest extends BaseResourceTest{
+public class LoopWrongTest extends BaseResourceTest {
 
     @Test
     public void testWrongLoop() {
@@ -30,8 +32,10 @@ public class LoopWrongTest extends BaseResourceTest{
                 "}";
         System.out.println(json);
         JsonObject jsonObject = new Gson().fromJson(json, JsonObject.class);
-        String s = engine.process(jsonObject, new ProcessContext());
-        log.data(s);
+        Assert.assertThrows(Exception.class, () -> {
+            String s = engine.process(jsonObject, new ProcessContext());
+            log.data(s);
+        });
     }
 
     @Test

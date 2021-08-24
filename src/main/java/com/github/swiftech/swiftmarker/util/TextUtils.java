@@ -1,4 +1,4 @@
-package com.github.swiftech.swiftmarker;
+package com.github.swiftech.swiftmarker.util;
 
 import org.apache.commons.lang3.StringUtils;
 

@@ -19,12 +19,12 @@ import java.util.List;
  **/
 public class ProcessContext {
 
-    private DataModelHelper modelHelper = new DataModelHelper();
+    private final DataModelHelper modelHelper = new DataModelHelper();
 
     /**
      * 分组名称 -> 信息集合
      */
-    private MessageGroup rootGroup = new MessageGroup(StringUtils.EMPTY);
+    private final MessageGroup rootGroup = new MessageGroup(StringUtils.EMPTY);
     // 指向当前的分组，适用于某些变量域内没有分组名的情况
     private MessageGroup currentGroup = rootGroup;
 
@@ -135,22 +135,19 @@ public class ProcessContext {
      */
     public void printAllMessages() {
         System.out.println("========= Processing Results ========  ");
-        this.visit(rootGroup, new Visitor<Message>() {
-            @Override
-            public void consume(Message message) {
-                StringBuilder output = new StringBuilder();
-                if (message instanceof TextMessage) {
-                    output.append(StringUtils.repeat(" ", (message.getLevel() - 1) * 2))
-                            .append("|- ")
-                            .append(((TextMessage) message).getContent());
-                }
-                else if (message instanceof MessageGroup) {
-                    output.append(StringUtils.repeat(" ", (message.getLevel() - 1) * 2))
-                            .append("|- ")
-                            .append(((MessageGroup) message).getGroupName());
-                }
-                System.out.println(output.toString());
+        this.visit(rootGroup, message -> {
+            StringBuilder output = new StringBuilder();
+            if (message instanceof TextMessage) {
+                output.append(StringUtils.repeat(" ", (message.getLevel() - 1) * 2))
+                        .append("|- ")
+                        .append(((TextMessage) message).getContent());
             }
+            else if (message instanceof MessageGroup) {
+                output.append(StringUtils.repeat(" ", (message.getLevel() - 1) * 2))
+                        .append("|- ")
+                        .append(((MessageGroup) message).getGroupName());
+            }
+            System.out.println(output);
         });
         System.out.println("========= Processing Results ========  ");
     }

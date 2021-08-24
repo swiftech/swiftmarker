@@ -5,7 +5,7 @@ package com.github.swiftech.swiftmarker;
  **/
 public class State {
 
-    private String value;
+    private final String value;
 
     private State(String value) {
         this.value = value;

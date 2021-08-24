@@ -1,6 +1,6 @@
-package com.github.swiftech;
+package com.github.swiftech.util;
 
-import com.github.swiftech.swiftmarker.TextUtils;
+import com.github.swiftech.swiftmarker.util.TextUtils;
 import org.junit.Assert;
 import org.junit.Test;
 

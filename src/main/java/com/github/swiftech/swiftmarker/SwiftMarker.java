@@ -24,7 +24,7 @@ import org.apache.commons.lang3.StringUtils;
  **/
 public class SwiftMarker {
 
-    private TemplateEngine templateEngine = new TemplateEngine();
+    private final TemplateEngine templateEngine = new TemplateEngine();
 
     /**
      * Prepare the template before rendering.
