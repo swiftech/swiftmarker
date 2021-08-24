@@ -103,9 +103,6 @@ Use ```$[var]...$[]``` pair to select elements in data model and loop them. If n
 
 	> Notice: The line only contains the '$[]' placeholder will not output a new line.
 
-> Limits:
-> * Only one array/JsonArray/List placeholder ```$[]``` is allowed for one line,
-
 
 * Loop expression with array/JsonArray/List element
 	If the array selected contains array/JsonArray/List, use ```${.0}```, ```${.1}```... to select params in the elements.
@@ -263,11 +260,15 @@ renderExpressionIfValueIsBlank| set false to avoid render expression if no value
 <dependency>
 	<groupId>com.github.swiftech</groupId>
 	<artifactId>swiftmarker</artifactId>
-	<version>2.2</version>
+	<version>3.0</version>
 </dependency>
 ```
 
 ### Release Update
+* v3.0
+  * redesign the architecture of template engine.
+  * supports nesting loop now.
+
 * 2020-01-31 v2.2
 	* upgrade java to 1.8
 	* upgrade dependencies.
@@ -287,14 +288,6 @@ renderExpressionIfValueIsBlank| set false to avoid render expression if no value
 ### Limitation
 * You can not have any reserved words in you template text, it will be recognized as expression.
 * You can not have multiple loop expression in one line.
-* Nesting loop expression is not supported. You can not have following expression:
-```
-$[collection1]
-$[collection2]
-...
-$[]
-$[]
-```
 * Comments in the template is not supported.
 
 ### Known issues

@@ -72,8 +72,12 @@ public class TemplateParser {
                 .action("?", S_READY, S_PENDING_LOGIC)
                 .action("$", S_READY, S_PENDING_OTHER)
                 .action("stanza", S_READY, S_IN_STANZA)
+                .action("??", S_PENDING_LOGIC, S_PENDING_LOGIC)
+                .action("?$", S_PENDING_LOGIC, S_PENDING_OTHER)
                 .action("?{", S_PENDING_LOGIC, S_IN_LOGIC)
                 .action("?*", S_PENDING_LOGIC, S_IN_STANZA)
+                .action("$$", S_PENDING_OTHER, S_PENDING_OTHER)
+                .action("$?", S_PENDING_OTHER, S_PENDING_LOGIC)
                 .action("$[", S_PENDING_OTHER, S_IN_LOOP)
                 .action("${", S_PENDING_OTHER, S_IN_VAR)
                 .action("$*", S_PENDING_OTHER, S_IN_STANZA)
@@ -99,11 +103,11 @@ public class TemplateParser {
             log.trace(String.valueOf((char) c));
             if (c == '$') {
                 //log.debug("entering loop or var");
-                appendToStanza((char) c);
+                appendToStanza((char) c); // may be not directive, so add to stanza first, if it isn't, this char will not be flushed.
                 this.sm.post(id, S_PENDING_OTHER);
             }
             else if (c == '?') {
-                appendToStanza((char) c);
+                appendToStanza((char) c); // may be not directive, so add to stanza first, if it isn't, this char will not be flushed.
                 //log.debug("entering logic");
                 this.sm.post(id, S_PENDING_LOGIC);
             }
@@ -174,6 +178,10 @@ public class TemplateParser {
                     appendToExpression((char) c);
                     sm.post(id, S_IN_EXP_VAR);
                 }
+                else if (sm.isStateIn(id, S_PENDING_LOGIC, S_PENDING_OTHER)) {
+                    appendToStanza((char) c);
+                    sm.post(id, S_IN_STANZA);
+                }
                 else {
                     if (sm.isStateIn(id, S_IN_EXP_LOGIC, S_IN_EXP_LOOP, S_IN_EXP_VAR)) {
                         appendToExpression((char) c);
@@ -190,7 +198,7 @@ public class TemplateParser {
         log.debug("Show tailed parse results: ");
         for (int i = 0; i < parseResult.size(); i++) {
             Directive directive = parseResult.get(i);
-            log.debug(String.format("[%d] %s", i, directive));
+            log.debug(String.format("[%2d] %s", i, directive));
         }
         return parseResult;
     }

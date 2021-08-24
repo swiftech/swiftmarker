@@ -1,6 +1,7 @@
 package com.github.swiftech;
 
 import com.github.swiftech.swiftmarker.TemplateParser;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Test;
 
 /**
@@ -19,6 +20,12 @@ public class TemplateParseAbnormalTest {
 
     @Test
     public void testStanzaWithKeywords() {
-        parser.parse(String.valueOf(Thread.currentThread().getId()), "how are you?..?[logic]xxx?[]");
+        parser.parse(RandomStringUtils.random(10), "how are you?..?{logic}xxx?{}");
+        parser.parse(RandomStringUtils.random(10), "how are you??{logic}xxx?{}");
+        parser.parse(RandomStringUtils.random(10), "how are you?${var}xxx");
+
+        parser.parse(RandomStringUtils.random(10), "how are you$..$[logic]xxx$[]");
+        parser.parse(RandomStringUtils.random(10), "how are you$$[logic]xxx$[]");
+        parser.parse(RandomStringUtils.random(10), "how are you$?{logic}xxx?{}");
     }
 }
