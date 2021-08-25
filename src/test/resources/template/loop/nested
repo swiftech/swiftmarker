@@ -1,8 +1,9 @@
+
 $[corporations]
 	姓名：${.name}
-	$[.directors]
+$[.directors]
 		${.name}
-	$[]
+$[]
 $[]
 
 循环结束

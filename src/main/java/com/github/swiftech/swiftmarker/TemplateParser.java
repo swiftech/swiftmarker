@@ -34,47 +34,51 @@ public class TemplateParser {
         StateBuilder<String, Character> builder = new StateBuilder<>();
         builder.state(S_PENDING_LOGIC)
                 .in(payload -> {
-                    log.debug("in pending logic: " + payload);
+                    log.trace("in pending logic: " + payload);
                     appendToStanza(payload); // may be not directive, so add to stanza first, if it isn't, this char will not be flushed.
                 })
                 .state(S_PENDING_OTHER)
                 .in(payload -> {
-                    log.debug("in pending other: " + payload);
+                    log.trace("in pending other: " + payload);
                     appendToStanza(payload); // may be not directive, so add to stanza first, if it isn't, this char will not be flushed.
                 })
                 .state(S_IN_LOGIC)
                 .in(payload -> {
-                    log.debug("in logic: " + payload);
+                    log.trace("in logic: " + payload);
                     pushStanzaWithoutLatest();
                 })
                 .state(S_IN_LOOP)
                 .in(payload -> {
-                    log.debug("in loop: " + payload);
+                    log.trace("in loop: " + payload);
                     pushStanzaWithoutLatest();
                 })
                 .state(S_IN_VAR)
                 .in(payload -> {
-                    log.debug("in var: " + payload);
+                    log.trace("in var: " + payload);
                     pushStanzaWithoutLatest();
                 })
                 .state(S_IN_EXP_LOGIC)
                 .in(payload -> {
-                    log.debug("in exp logic: " + payload);
+                    log.trace("in exp logic: " + payload);
                     appendToExpression(payload);
                 })
                 .state(S_IN_EXP_LOOP)
                 .in(payload -> {
-                    log.debug("in exp loop: " + payload);
+                    log.trace("in exp loop: " + payload);
                     appendToExpression(payload);
                 })
                 .state(S_IN_EXP_VAR)
                 .in(payload -> {
-                    log.debug("in exp var: " + payload);
+                    log.trace("in exp var: " + payload);
                     appendToExpression(payload);
+                })
+                .state(S_ESCAPING)
+                .in(payload -> {
+                    log.trace("escaping: " + payload);
                 })
                 .state(S_IN_STANZA)
                 .in(payload -> {
-                    log.debug("in stanza: " + payload);
+                    log.trace("in stanza: " + payload);
                 })
                 .initialize("ready", S_READY)
                 .action("?", S_READY, S_PENDING_LOGIC)
@@ -83,12 +87,15 @@ public class TemplateParser {
                 .action("??", S_PENDING_LOGIC, S_PENDING_LOGIC)
                 .action("?$", S_PENDING_LOGIC, S_PENDING_OTHER)
                 .action("?{", S_PENDING_LOGIC, S_IN_LOGIC)
+                .action("?\\{", S_PENDING_LOGIC, S_ESCAPING)
                 .action("?*", S_PENDING_LOGIC, S_IN_STANZA)
                 .action("$$", S_PENDING_OTHER, S_PENDING_OTHER)
                 .action("$?", S_PENDING_OTHER, S_PENDING_LOGIC)
                 .action("$[", S_PENDING_OTHER, S_IN_LOOP)
                 .action("${", S_PENDING_OTHER, S_IN_VAR)
+                .action("$\\{ or $\\[", S_PENDING_OTHER, S_ESCAPING)
                 .action("$*", S_PENDING_OTHER, S_IN_STANZA)
+                .action("?\\{* or $\\{* or $\\[*", S_ESCAPING, S_IN_STANZA)
                 .action("?{*", S_IN_LOGIC, S_IN_EXP_LOGIC)
                 .action("$[*", S_IN_LOOP, S_IN_EXP_LOOP)
                 .action("${*", S_IN_VAR, S_IN_EXP_VAR)
@@ -100,7 +107,7 @@ public class TemplateParser {
                 .action("${**", S_IN_EXP_VAR, S_IN_EXP_VAR)
                 .action("?{}", S_IN_LOGIC, S_IN_STANZA)
                 .action("$[]", S_IN_LOOP, S_IN_STANZA)
-                .action("${}", S_IN_VAR, S_IN_STANZA) //这个是效指令，直接废弃
+                .action("${}", S_IN_VAR, S_IN_STANZA) // invalid directive, ignore
                 .action("**", S_IN_STANZA, S_IN_STANZA)
                 .action("?", S_IN_STANZA, S_PENDING_LOGIC)
                 .action("$", S_IN_STANZA, S_PENDING_OTHER)
@@ -117,6 +124,9 @@ public class TemplateParser {
             }
             else if (c == '?') {
                 this.sm.post(id, S_PENDING_LOGIC, (char) c);
+            }
+            else if (c == '\\'){
+                this.sm.post(id, S_ESCAPING, (char)c);
             }
             else if (c == '[') {
                 if (sm.isState(id, S_PENDING_OTHER)) {
@@ -181,7 +191,7 @@ public class TemplateParser {
                 else if (sm.isState(id, S_IN_VAR)) {
                     sm.post(id, S_IN_EXP_VAR, (char) c);
                 }
-                else if (sm.isStateIn(id, S_PENDING_LOGIC, S_PENDING_OTHER)) {
+                else if (sm.isStateIn(id, S_PENDING_LOGIC, S_PENDING_OTHER, S_ESCAPING)) {
                     appendToStanza((char) c);
                     sm.post(id, S_IN_STANZA, (char) c);
                 }

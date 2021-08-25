@@ -1,0 +1,8 @@
+#
+entity "table_1" {
+    field_1
+}
+entity "table_2" {
+    field_2
+}
+#

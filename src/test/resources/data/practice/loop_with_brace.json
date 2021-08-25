@@ -1,0 +1,20 @@
+{
+  "lTables" : [
+    {
+      "table_name": "table_1",
+      "fields": [
+        {
+          "name": "field_1"
+        }
+      ]
+    },
+    {
+      "table_name": "table_2",
+      "fields": [
+        {
+          "name": "field_2"
+        }
+      ]
+    }
+  ]
+}

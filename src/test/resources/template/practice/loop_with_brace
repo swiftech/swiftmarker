@@ -1,0 +1,9 @@
+#
+$[lTables]
+entity "${.table_name}" {
+$[.fields]
+    ${.name}
+$[]
+}
+$[]
+#

@@ -21,4 +21,5 @@ public interface Constants {
     String S_IN_EXP_LOOP = "in_exp_loop";
     String S_IN_EXP_VAR = "in_exp_var";
     String S_IN_STANZA = "in_stanza";
+    String S_ESCAPING = "escaping";
 }

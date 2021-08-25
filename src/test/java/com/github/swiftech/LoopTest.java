@@ -60,7 +60,7 @@ public class LoopTest extends BaseResourceTest {
      */
     @Test
     public void testBasicScope() {
-        String rendered = super.runFromResourceAndAssert("loop/basic_scope","loop/basic");
+        String rendered = super.runFromResourceAndAssert("loop/basic_scope", "loop/basic");
         log.data(rendered);
     }
 
@@ -167,14 +167,18 @@ public class LoopTest extends BaseResourceTest {
     }
 
     /**
-     * 引擎暂不支持循环嵌套循环 TODO
+     *
      */
     @Test
     public void testNestedLoop() {
-        Assert.assertThrows(Throwable.class, () -> {
-            String rendered = super.runFromResourceAndAssert("loop/nested");
-            log.data(rendered);
-        });
+        String rendered = super.runFromResourceAndAssert("loop/nested");
+        log.data(rendered);
+    }
+
+    @Test
+    public void testNestedLoopSimple() {
+        String rendered = super.runFromResourceAndAssert("loop/nested", "loop/nested_simple", "loop/nested_simple");
+        log.data(rendered);
     }
 
     /**

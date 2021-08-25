@@ -17,8 +17,15 @@ public class PracticeTest extends BaseResourceTest {
      * 测试空循环
      */
     @Test
-    public void testEmptyLoop() {
+    public void testEntityField() {
         String rendered = super.runFromResourceAndAssert("practice/entity_field", "practice/entity_field");
+        log.data(rendered);
+    }
+
+
+    @Test
+    public void testLoopWithBrace() {
+        String rendered = super.runFromResourceAndAssert("practice/loop_with_brace");
         log.data(rendered);
     }
 }

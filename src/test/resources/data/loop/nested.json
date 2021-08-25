@@ -44,7 +44,7 @@
 	  "name": "",
 	  "selected": true,
 	  "note": "anonymous",
-	  "director": [
+	  "directors": [
 		{
 		  "name" : "Peter"
 		},
