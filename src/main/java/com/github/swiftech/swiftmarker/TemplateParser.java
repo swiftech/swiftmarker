@@ -17,12 +17,12 @@ public class TemplateParser {
 
     private final Logger log = Logger.getInstance();
 
-    private final StateMachine<String, String> sm;
+    private final StateMachine<String, Character> sm;
 
     /**
      * Store parse result of the template.
      */
-    private List<Directive> parseResult = new LinkedList<>();
+    private final List<Directive> parseResult = new LinkedList<>();
 
     /**
      * Cache to compose expressions and stanzas
@@ -31,42 +31,50 @@ public class TemplateParser {
     private StringBuilder expressionBuf = new StringBuilder();
 
     public TemplateParser() {
-        StateBuilder<String, String> builder = new StateBuilder<>();
+        StateBuilder<String, Character> builder = new StateBuilder<>();
         builder.state(S_PENDING_LOGIC)
                 .in(payload -> {
-                    log.debug("in pending logic");
+                    log.debug("in pending logic: " + payload);
+                    appendToStanza(payload); // may be not directive, so add to stanza first, if it isn't, this char will not be flushed.
                 })
                 .state(S_PENDING_OTHER)
                 .in(payload -> {
-                    log.debug("in pending other");
+                    log.debug("in pending other: " + payload);
+                    appendToStanza(payload); // may be not directive, so add to stanza first, if it isn't, this char will not be flushed.
                 })
                 .state(S_IN_LOGIC)
                 .in(payload -> {
-                    log.debug("in logic");
+                    log.debug("in logic: " + payload);
+                    pushStanzaWithoutLatest();
                 })
                 .state(S_IN_LOOP)
                 .in(payload -> {
-                    log.debug("in loop");
+                    log.debug("in loop: " + payload);
+                    pushStanzaWithoutLatest();
                 })
                 .state(S_IN_VAR)
                 .in(payload -> {
-                    log.debug("in var");
+                    log.debug("in var: " + payload);
+                    pushStanzaWithoutLatest();
                 })
                 .state(S_IN_EXP_LOGIC)
                 .in(payload -> {
-                    log.debug("in exp logic");
+                    log.debug("in exp logic: " + payload);
+                    appendToExpression(payload);
                 })
                 .state(S_IN_EXP_LOOP)
                 .in(payload -> {
-                    log.debug("in exp loop");
+                    log.debug("in exp loop: " + payload);
+                    appendToExpression(payload);
                 })
                 .state(S_IN_EXP_VAR)
                 .in(payload -> {
-                    log.debug("in exp var");
+                    log.debug("in exp var: " + payload);
+                    appendToExpression(payload);
                 })
                 .state(S_IN_STANZA)
                 .in(payload -> {
-                    log.debug("in stanza");
+                    log.debug("in stanza: " + payload);
                 })
                 .initialize("ready", S_READY)
                 .action("?", S_READY, S_PENDING_LOGIC)
@@ -84,9 +92,12 @@ public class TemplateParser {
                 .action("?{*", S_IN_LOGIC, S_IN_EXP_LOGIC)
                 .action("$[*", S_IN_LOOP, S_IN_EXP_LOOP)
                 .action("${*", S_IN_VAR, S_IN_EXP_VAR)
-                .action("?{*}", S_IN_EXP_LOGIC, S_IN_STANZA)
+                .action("?{*", S_IN_EXP_LOGIC, S_IN_STANZA)
+                .action("?{**", S_IN_EXP_LOGIC, S_IN_EXP_LOGIC)
                 .action("$[*]", S_IN_EXP_LOOP, S_IN_STANZA)
+                .action("$[**", S_IN_EXP_LOOP, S_IN_EXP_LOOP)
                 .action("${*}", S_IN_EXP_VAR, S_IN_STANZA)
+                .action("${**", S_IN_EXP_VAR, S_IN_EXP_VAR)
                 .action("?{}", S_IN_LOGIC, S_IN_STANZA)
                 .action("$[]", S_IN_LOOP, S_IN_STANZA)
                 .action("${}", S_IN_VAR, S_IN_STANZA) //这个是效指令，直接废弃
@@ -102,94 +113,87 @@ public class TemplateParser {
         template.chars().forEach(c -> {
             log.trace(String.valueOf((char) c));
             if (c == '$') {
-                //log.debug("entering loop or var");
-                appendToStanza((char) c); // may be not directive, so add to stanza first, if it isn't, this char will not be flushed.
-                this.sm.post(id, S_PENDING_OTHER);
+                this.sm.post(id, S_PENDING_OTHER, (char) c);
             }
             else if (c == '?') {
-                appendToStanza((char) c); // may be not directive, so add to stanza first, if it isn't, this char will not be flushed.
-                //log.debug("entering logic");
-                this.sm.post(id, S_PENDING_LOGIC);
+                this.sm.post(id, S_PENDING_LOGIC, (char) c);
             }
             else if (c == '[') {
                 if (sm.isState(id, S_PENDING_OTHER)) {
-                    pushStanzaWithoutLatest();
-                    sm.post(id, S_IN_LOOP);
+                    sm.post(id, S_IN_LOOP, (char) c);
                 }
                 else {
                     appendToStanza((char) c);
-                    sm.post(id, S_IN_STANZA);
+                    sm.post(id, S_IN_STANZA, (char) c);
                 }
             }
             else if (c == '{') {
                 if (sm.isState(id, S_PENDING_OTHER)) {
-                    pushStanzaWithoutLatest();
-                    sm.post(id, S_IN_VAR);
+                    sm.post(id, S_IN_VAR, (char) c);
                 }
                 else if (sm.isState(id, S_PENDING_LOGIC)) {
-                    pushStanzaWithoutLatest();
-                    sm.post(id, S_IN_LOGIC);
+                    sm.post(id, S_IN_LOGIC, (char) c);
                 }
                 else {
                     appendToStanza((char) c);
-                    sm.post(id, S_IN_STANZA);
+                    sm.post(id, S_IN_STANZA, (char) c);
                 }
             }
             else if (c == '}') {
                 if (sm.isStateIn(id, S_IN_LOGIC, S_IN_VAR)) {
                     pushExpression(id);
-                    sm.post(id, S_IN_STANZA);
+                    sm.post(id, S_IN_STANZA, (char) c);
                 }
                 else if (sm.isStateIn(id, S_IN_EXP_LOGIC)) {
                     pushExpression(id);
-                    sm.post(id, S_IN_STANZA);
+                    sm.post(id, S_IN_STANZA, (char) c);
                 }
                 else if (sm.isStateIn(id, S_IN_EXP_VAR)) {
                     pushExpression(id);
-                    sm.post(id, S_IN_STANZA);
+                    sm.post(id, S_IN_STANZA, (char) c);
                 }
                 else {
                     appendToStanza((char) c);
+                    sm.post(id, S_IN_STANZA, (char) c);
                 }
             }
             else if (c == ']') {
                 if (sm.isStateIn(id, S_IN_LOOP)) {
                     pushExpression(id);
-                    sm.post(id, S_IN_STANZA);
+                    sm.post(id, S_IN_STANZA, (char) c);
                 }
                 else if (sm.isState(id, S_IN_EXP_LOOP)) {
                     pushExpression(id);
-                    sm.post(id, S_IN_STANZA);
+                    sm.post(id, S_IN_STANZA, (char) c);
                 }
                 else {
                     appendToStanza((char) c);
+                    sm.post(id, S_IN_STANZA, (char) c);
                 }
             }
             else {
                 if (sm.isStateIn(id, S_IN_LOGIC)) {
-                    appendToExpression((char) c);
-                    sm.post(id, S_IN_EXP_LOGIC);
+                    sm.post(id, S_IN_EXP_LOGIC, (char) c);
                 }
                 else if (sm.isState(id, S_IN_LOOP)) {
-                    appendToExpression((char) c);
-                    sm.post(id, S_IN_EXP_LOOP);
+                    sm.post(id, S_IN_EXP_LOOP, (char) c);
                 }
                 else if (sm.isState(id, S_IN_VAR)) {
-                    appendToExpression((char) c);
-                    sm.post(id, S_IN_EXP_VAR);
+                    sm.post(id, S_IN_EXP_VAR, (char) c);
                 }
                 else if (sm.isStateIn(id, S_PENDING_LOGIC, S_PENDING_OTHER)) {
                     appendToStanza((char) c);
-                    sm.post(id, S_IN_STANZA);
+                    sm.post(id, S_IN_STANZA, (char) c);
                 }
                 else {
                     if (sm.isStateIn(id, S_IN_EXP_LOGIC, S_IN_EXP_LOOP, S_IN_EXP_VAR)) {
-                        appendToExpression((char) c);
                         // still in expression
+                        sm.post(id, sm.getCurrentState(id), (char) c);
                     }
                     else {
-                        appendToStanza((char) c);
                         // still in stanza
+                        appendToStanza((char) c);
+                        sm.post(id, S_IN_STANZA, (char) c);
                     }
                 }
             }
