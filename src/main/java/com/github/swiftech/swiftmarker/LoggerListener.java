@@ -7,6 +7,8 @@ public interface LoggerListener {
 
     void onLog(String log);
 
+    void onTrace(String log);
+
     void onDebug(String log);
 
     void onInfo(String log);

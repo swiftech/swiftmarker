@@ -26,6 +26,7 @@ public class Config {
 
     /**
      * 输入换行符
+     * @deprecated
      */
     private String inputLineBreaker = StringUtils.LF;
 

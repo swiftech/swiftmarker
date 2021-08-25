@@ -89,7 +89,7 @@ public class Logger {
                 System.out.printf("[SwiftMarker] [TRACE] %s%n", msg);
             }
             else {
-                loggerListener.onDebug(String.format("[SwiftMarker] %s", msg));
+                loggerListener.onTrace(String.format("[SwiftMarker] %s", msg));
             }
         }
     }

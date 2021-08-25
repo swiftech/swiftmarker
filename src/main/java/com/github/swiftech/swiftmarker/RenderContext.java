@@ -1,8 +1,5 @@
 package com.github.swiftech.swiftmarker;
 
-import com.github.swiftech.swiftmarker.constant.Constants;
-import org.apache.commons.lang3.StringUtils;
-
 import java.util.Stack;
 
 /**
@@ -12,141 +9,14 @@ import java.util.Stack;
  **/
 public class RenderContext {
 
-    // 逻辑表达式堆栈
-    private final Stack<String> logicKeyStack = new Stack<>();
-
-    // 循环表达式堆栈
-    private final Stack<String> loopKeyStack = new Stack<>();
-
-    // 状态堆栈
-    private final Stack<State> stateStack = new Stack<>();
-
     // 渲染缓存堆栈
     private final Stack<StringBuilder> renderBufStack = new Stack<>();
-
-    // 当前行
-    private String line;
 
     public RenderContext() {
     }
 
-    public RenderContext(String line) {
-        this.line = line;
-    }
-
     public void init() {
         renderBufStack.push(new StringBuilder());
-    }
-
-    public boolean isStartLogic() {
-        String logicKey = StringUtils.substringBetween(line, "?{", "}");
-        if (StringUtils.isNotBlank(logicKey)) {
-            logicKeyStack.push(logicKey);
-            return true;
-        }
-        return false;
-    }
-
-    public String getLogicKey() {
-        if (!logicKeyStack.isEmpty()) {
-            return logicKeyStack.peek();
-        }
-        return null;
-    }
-
-    /**
-     * 判断是否处于逻辑退出（包含逻辑退出标记）
-     *
-     * @return
-     */
-    public boolean isOutLogic() {
-        if (StringUtils.contains(line, Constants.EXP_LOGIC_END)) {
-            return true;
-        }
-        return false;
-    }
-
-    public void pushLogic(boolean logic) {
-        if (logic) {
-            stateStack.push(State.newLogicTrue());
-        }
-        else {
-            stateStack.push(State.newLogicFalse());
-        }
-    }
-
-    public boolean isLogicTrue() {
-        if (!stateStack.isEmpty()) {
-            return stateStack.peek().isLogicTrue();
-        }
-        return false;
-    }
-
-    public boolean isLogicFalse() {
-        if (!stateStack.isEmpty()) {
-            return stateStack.peek().isLogicFalse();
-        }
-        return false;
-    }
-
-    public void popLogicState() {
-        if (!stateStack.empty() && stateStack.peek().isLogic()) {
-            stateStack.pop();
-        }
-    }
-
-
-    /**
-     * @return
-     */
-    public boolean isStartLoop() {
-        String loopKey = StringUtils.substringBetween(line, "$[", "]");
-        if (StringUtils.isNotBlank(loopKey)) {
-            loopKeyStack.push(loopKey);
-            stateStack.push(State.newLoop());
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * @return
-     */
-    public boolean isInLoop() {
-        if (stateStack.isEmpty()) {
-            return false;
-        }
-        return stateStack.peek().isLoop();
-    }
-
-    /**
-     * @return
-     */
-    public boolean isOutLoop() {
-        return StringUtils.contains(line.trim(), Constants.EXP_LOOP_END);
-    }
-
-    public void popLoopState() {
-        if (!stateStack.empty() && stateStack.peek().isLoop()) {
-            stateStack.pop();
-        }
-    }
-
-    /**
-     * 整行都是结尾（去空格）
-     *
-     * @return
-     */
-    public boolean isWholeLineLoopEnd() {
-        return Constants.EXP_LOOP_END.equals(line.trim());
-    }
-
-
-    public String getLoopKey() {
-        if (!loopKeyStack.empty()) {
-            return loopKeyStack.peek();
-        }
-        return null;
     }
 
     /**
@@ -234,15 +104,6 @@ public class RenderContext {
             throw new IllegalStateException("Render buffer is empty");
         }
         return renderBufStack.pop();
-    }
-
-
-    public String getLine() {
-        return line;
-    }
-
-    public void setLine(String line) {
-        this.line = line;
     }
 
 
