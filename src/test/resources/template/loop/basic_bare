@@ -1,0 +1,6 @@
+$[not-exist]
+	${.index}: ${.option}
+$[]
+$[question.options]
+	${.index}: ${.option}
+$[]

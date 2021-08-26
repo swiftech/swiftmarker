@@ -1,8 +1,10 @@
 #
 entity "table_1" {
+    id
     field_1
 }
 entity "table_2" {
+    id
     field_2
 }
 #

@@ -15,13 +15,4 @@ public class LoopBegin extends NestableDirective implements Begin {
         super.isAvailable = isAvailable;
     }
 
-//    @Override
-//    public String toString() {
-//        return "LoopBegin{" +
-//                "previous=" + (previous == null ? "null" : previous.getClass().getSimpleName()) +
-//                ", next=" + (next == null ? "null" : next.getClass().getSimpleName()) +
-//                ", value='" + value + '\'' +
-//                ", isAvailable=" + isAvailable +
-//                '}';
-//    }
 }

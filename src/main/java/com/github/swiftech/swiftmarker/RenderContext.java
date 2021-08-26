@@ -3,14 +3,22 @@ package com.github.swiftech.swiftmarker;
 import java.util.Stack;
 
 /**
- * 模板引擎上下文，包括：
+ * 模板引擎上下文，包括：渲染缓存，换行处理标记
  *
  * @author Allen 2018-12-03
  **/
 public class RenderContext {
 
-    // 渲染缓存堆栈
+    /**
+     * Stack of render buffer,
+     */
     private final Stack<StringBuilder> renderBufStack = new Stack<>();
+
+    /**
+     * For some specific situation, line break is need to be trimmed after one directive was processed.
+     *
+     */
+    private boolean needMoreTrim;
 
     public RenderContext() {
     }
@@ -59,14 +67,28 @@ public class RenderContext {
         return buf;
     }
 
-    public void trimTailLineBreak() {
+    public boolean trimTailLineBreak() {
         StringBuilder buf = getBuffer();
         if (buf == null || buf.length() == 0) {
-            return;
+            return false;
         }
         if (buf.charAt(buf.length() - 1) == '\n') {
             buf.deleteCharAt(buf.length() - 1);
+            return true;
         }
+        return false;
+    }
+
+    public boolean trimHeadLineBreak() {
+        StringBuilder buf = getBuffer();
+        if (buf == null || buf.length() == 0) {
+            return false;
+        }
+        if (buf.charAt(0) == '\n') {
+            buf.deleteCharAt(0);
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -106,5 +128,11 @@ public class RenderContext {
         return renderBufStack.pop();
     }
 
+    public boolean isNeedMoreTrim() {
+        return needMoreTrim;
+    }
 
+    public void setNeedMoreTrim(boolean needMoreTrim) {
+        this.needMoreTrim = needMoreTrim;
+    }
 }

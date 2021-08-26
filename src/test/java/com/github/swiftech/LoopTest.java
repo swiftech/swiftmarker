@@ -7,7 +7,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -43,6 +42,15 @@ public class LoopTest extends BaseResourceTest {
     @Test
     public void testBasicLoop() {
         String rendered = super.runFromResourceAndAssert("loop/basic");
+        log.data(rendered);
+    }
+
+    /**
+     * 测试基本的循环（纯嵌套语句）
+     */
+    @Test
+    public void testBasicBareLoop() {
+        String rendered = super.runFromResourceAndAssert("loop/basic_bare", "loop/basic");
         log.data(rendered);
     }
 

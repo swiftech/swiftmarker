@@ -2,6 +2,11 @@
   "lTables" : [
     {
       "table_name": "table_1",
+      "fks": [
+        {
+          "name": "id"
+        }
+      ],
       "fields": [
         {
           "name": "field_1"
@@ -10,6 +15,11 @@
     },
     {
       "table_name": "table_2",
+      "fks": [
+        {
+          "name": "id"
+        }
+      ],
       "fields": [
         {
           "name": "field_2"

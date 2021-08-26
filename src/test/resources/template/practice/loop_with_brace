@@ -1,6 +1,19 @@
 #
 $[lTables]
 entity "${.table_name}" {
+$[not-exits]
+    ${.name}
+$[]
+$[.fks]
+?{.name}
+    ${.name}
+?{}
+$[]
+$[not-exits]
+?{.name}
+    ${.name}
+?{}
+$[]
 $[.fields]
     ${.name}
 $[]

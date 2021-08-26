@@ -79,8 +79,11 @@ public class TemplateEngine {
         log.data(template);
         TemplateParser templateParser = new TemplateParser();
         this.directives = templateParser.parse(this.toString(), this.template);
+        if (this.directives == null || this.directives.isEmpty()) {
+            throw new RuntimeException("Template is invalid");
+        }
         StackDataModelHandler dataHandler = new StackDataModelHandler(dataModel, rootDataModel, processContext);
-        log.info("Start to process rendering");
+        log.info("== Start to process rendering ==");
         this.render(0, new Stack<>(), dataHandler, 0);
         return renderContext.popBuffer().toString();
     }
@@ -93,7 +96,7 @@ public class TemplateEngine {
      * @return 返回遇到循环结束的时候的指令位置（也就是上一层递归需要跳到哪个指令之后开始执行）
      */
     private int render(int directiveCursor, Stack<Directive> directiveStack, StackDataModelHandler dataModelHandler, int level) {
-        log.debug(String.format("== render from %d ==", directiveCursor));
+        log.debug(String.format("render from %d", directiveCursor));
         renderContext.createBuffer();
         // 从给定的指令位置开始
         for (int i = directiveCursor; i < directives.size(); i++) {
@@ -105,16 +108,20 @@ public class TemplateEngine {
                 if (isTopDirectiveAvailable(directiveStack)) {
                     boolean available = dataModelHandler.isLogicalTrueOrFalse(logicBegin.getValue());
                     debugDirective(available ? "available" : "not available", i, level);
-                    logicBegin.setAvailable(available);// TODO
+                    logicBegin.setAvailable(available);
                     directiveStack.push(logicBegin);
                     // 处理前面的换行
                     if (logicBegin.isWrappedWithLineBreak()) {
-                        debugDirective("trail last line break", i, level);
-                        renderContext.trimTailLineBreak();
+                        debugDirective("trim last line break", i, level);
+                        boolean needTrimMore = !renderContext.trimTailLineBreak();
+                        if (needTrimMore) {
+                            log.debug("fail and need more trim later");
+                            renderContext.setNeedMoreTrim(true); // 处理模版是以嵌套指令开始的情况
+                        }
                     }
                 }
                 else {
-                    printStack(directiveStack);
+                    //printStack(directiveStack);
                     logicBegin.setAvailable(false);
                     directiveStack.push(logicBegin);
                 }
@@ -124,10 +131,10 @@ public class TemplateEngine {
                 Directive last = directiveStack.peek();
                 if (last instanceof LogicBegin) {
                     LogicEnd logicEnd = (LogicEnd) directive;
-                    logicEnd.setAvailable(((LogicBegin) last).isAvailable());// TODO
+                    logicEnd.setAvailable(((LogicBegin) last).isAvailable());
                     directiveStack.pop();
                     if (logicEnd.isAvailable() && logicEnd.isWrappedWithLineBreak()) {
-                        debugDirective("trail last line break", i, level);
+                        debugDirective("trim last line break", i, level);
                         renderContext.trimTailLineBreak();
                     }
                 }
@@ -140,9 +147,13 @@ public class TemplateEngine {
                 debugDirective("loop begin ->", i, level);
                 // 从当前模型中获取集合，将集合元素倒序压入堆栈
                 if (isTopDirectiveAvailable(directiveStack)) {
-                    debugDirective("trail last line break", i, level);
-                    renderContext.trimTailLineBreak();// TODO
                     LoopBegin loopBegin = (LoopBegin) directive;
+                    debugDirective("trim last line break", i, level);
+                    boolean needTrimMore = !renderContext.trimTailLineBreak();
+                    if (needTrimMore) {
+                        log.debug("fail and need more trim later");
+                        renderContext.setNeedMoreTrim(true); // 处理模版是以嵌套指令开始的情况
+                    }
                     LoopMatrix loopMatrix = dataModelHandler.onLoop(loopBegin.getValue());
                     List<Map<String, Object>> matrix = loopMatrix.getMatrix();
                     if (matrix == null || matrix.isEmpty()) {
@@ -179,19 +190,25 @@ public class TemplateEngine {
                 if (isTopDirectiveLoopBegin(directiveStack)) {
                     if (isTopDirectiveAvailable(directiveStack)) {
                         loopEnd.setAvailable(true);
-                        log.debug("pop last model");
+                        debugDirective("pop last model", i, level);
                         dataModelHandler.popDataModel();
                     }
                     directiveStack.pop();
-                    if (loopEnd.isAvailable() && loopEnd.isWrappedWithLineBreak()) {
-                        debugDirective("trim last line break", i, level);
-                        renderContext.trimTailLineBreak();
+                    if (loopEnd.isAvailable()) {
+                        if (loopEnd.isWrappedWithLineBreak()) {
+                            debugDirective("trim last line break", i, level);
+                            renderContext.trimTailLineBreak();
+                        }
+                        debugDirective(String.format("== render end at %d ==", i), i, level);
+                        if (level > 0) {
+                            log.debug("quiting this level: " + level);
+                            return i; // 子递归时及时退出，并且告诉上一层到哪个指令是循环结束
+                        }
                     }
-                    debugDirective(String.format("== render end at %d ==", i), i, level);
-                    if (level > 0) return i;// 此处告诉上一层到哪个指令是循环结束
                 }
                 else {
                     log.warn("NOT MATCHED LOOP DIRECTIVE");
+                    printStack(directiveStack);
                 }
             }
             else if (directive instanceof Var) {
@@ -205,10 +222,10 @@ public class TemplateEngine {
                 if (isTopDirectiveAvailable(directiveStack)) {
                     Stanza stanza = (Stanza) directive;
                     if (stanza.getValue() != null) {
-                        debugDirective("append stanza --", i, level);
-                        String export = stanza.getValue();
-                        log.debug(String.format("  '%s'", export));
-                        renderContext.appendToBuffer(export);
+                        debugDirective("append stanza ", i, level);
+                        debugDirective(String.format("'%s'", stanza.getValue()), i, level);
+                        renderContext.appendToBuffer(stanza.getValue());
+                        this.trimMoreLineBreakAtHead(); // 处理模版是以嵌套指令开始的情况
                     }
                 }
             }
@@ -216,13 +233,15 @@ public class TemplateEngine {
         return 0;
     }
 
-    private void debugDirective(String msg, int i, int level) {
-        log.debug(String.format("[%2d] %s %s", i, StringUtils.repeat('-', level * 2), msg));
-    }
-
-    private void printStack(Stack<Directive> directiveStack) {
-        directiveStack.forEach(directive -> System.out.printf("%s(%s),", directive.getClass().getSimpleName(), (directive instanceof NestableDirective ? ((NestableDirective) directive).isAvailable() : "")));
-        System.out.println();
+    /**
+     * 如果之前的指令处理标记为需要修剪（need trim)，那么把当前的 Stanza 头部的换行删掉
+     */
+    private void trimMoreLineBreakAtHead() {
+        if (renderContext.isNeedMoreTrim()) {
+            log.debug("trim last head line break ");
+            renderContext.trimHeadLineBreak();
+            renderContext.setNeedMoreTrim(false);
+        }
     }
 
     /**
@@ -254,6 +273,17 @@ public class TemplateEngine {
         }
         return false;
     }
+
+
+    private void debugDirective(String msg, int i, int level) {
+        log.debug(String.format("(%2d) %s %s", i, StringUtils.repeat('-', level * 2), msg));
+    }
+
+    private void printStack(Stack<Directive> directiveStack) {
+        directiveStack.forEach(directive -> System.out.printf("%s(%s),", directive.getClass().getSimpleName(), (directive instanceof NestableDirective ? ((NestableDirective) directive).isAvailable() : "")));
+        System.out.println();
+    }
+
 
     public void setTemplate(String template) {
         this.template = template;

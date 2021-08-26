@@ -209,7 +209,12 @@ public class TemplateParser {
             }
         });
         pushStanza();
-        log.debug("Show tailed parse results: ");
+        // 特殊处理，如果第一个是嵌套指令，那么在头上增加一个换行以避免后续处理出现问题
+//        Directive first = parseResult.get(0);
+//        if (first instanceof Begin){
+//            parseResult.add(0, new Stanza("\n"));
+//        }
+        log.debug("Show template parse results: ");
         for (int i = 0; i < parseResult.size(); i++) {
             Directive directive = parseResult.get(i);
             log.debug(String.format("[%2d] %s", i, directive));
@@ -229,7 +234,7 @@ public class TemplateParser {
     private void pushStanza() {
         if (stanzaBuf.length() > 0) {
             // 如果一个可嵌套指令单独一行的，也就是前后各有一个换行符，那么删除一个换行符（这个只处理常规的情况，对于模版结尾出现可嵌套指令的情况，只能在最后特殊处理）
-            System.out.printf("Stanza: '%s'%n", stanzaBuf);
+            log.debug(String.format("Stanza: '%s'", stanzaBuf));
             Stanza newStanza = new Stanza(stanzaBuf.toString());
             if (parseResult.size() > 0) {
                 Directive preDirective = parseResult.get(parseResult.size() - 1);
@@ -249,7 +254,7 @@ public class TemplateParser {
     private void pushExpression(String id) {
         Directive directive = null;
         if (expressionBuf.length() > 0) {
-            System.out.println("Expression: " + expressionBuf);
+            log.debug(String.format("Expression: %s", expressionBuf));
             if (sm.isState(id, S_IN_EXP_LOGIC)) {
                 directive = new LogicBegin(expressionBuf.toString());
             }
