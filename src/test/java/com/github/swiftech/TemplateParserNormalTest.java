@@ -1,6 +1,7 @@
 package com.github.swiftech;
 
 import com.github.swiftech.swiftmarker.TemplateParser;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Test;
 
 /**
@@ -65,6 +66,13 @@ public class TemplateParserNormalTest {
                 "$[loop2]\n" +
                 "yyy\n" +
                 "$[]");
+    }
+
+    @Test
+    public void testEscape() {
+        parser.parse(RandomStringUtils.random(10), "$\\{var}");
+        parser.parse(RandomStringUtils.random(10), "$\\[loop]$\\[]");
+        parser.parse(RandomStringUtils.random(10), "?\\{logic}?\\{}");
     }
 
 }

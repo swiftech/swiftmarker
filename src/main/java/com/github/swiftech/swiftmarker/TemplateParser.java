@@ -109,8 +109,8 @@ public class TemplateParser {
                 .action("$[]", S_IN_LOOP, S_IN_STANZA)
                 .action("${}", S_IN_VAR, S_IN_STANZA) // invalid directive, ignore
                 .action("**", S_IN_STANZA, S_IN_STANZA)
-                .action("?", S_IN_STANZA, S_PENDING_LOGIC)
-                .action("$", S_IN_STANZA, S_PENDING_OTHER)
+                .action("*?", S_IN_STANZA, S_PENDING_LOGIC)
+                .action("*$", S_IN_STANZA, S_PENDING_OTHER)
         ;
         this.sm = new StateMachine<>(builder);
     }
@@ -209,11 +209,6 @@ public class TemplateParser {
             }
         });
         pushStanza();
-        // 特殊处理，如果第一个是嵌套指令，那么在头上增加一个换行以避免后续处理出现问题
-//        Directive first = parseResult.get(0);
-//        if (first instanceof Begin){
-//            parseResult.add(0, new Stanza("\n"));
-//        }
         log.debug("Show template parse results: ");
         for (int i = 0; i < parseResult.size(); i++) {
             Directive directive = parseResult.get(i);

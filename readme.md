@@ -13,17 +13,14 @@ SwiftMarker是一个轻量级的模板引擎
 * You can simply use dotted name like ```foo.bar``` to select params in data model.
 * Multiple types are supported to composite data model: array, ```List```, ```JsonArray```, ```Map```, ```JsonObject``` and even plain Bean object. you can combine them freely.
 * Loop expression
-* Logic expression
+* Logical expression
 
 ### Dependencies
-* java 1.8+
-* commons-lang3 3.9+
-* gson 2.8+
-
+* JDK 8+
 
 ### Tutorial
 
-##### Intialize
+##### Initialize
 
 ```java
 String strTemplate = "......";
@@ -45,7 +42,7 @@ ${yoda.word2} leads to suffering.
 ```
 
 * Data Model
-```javascript
+```json
 {
     "yoda": {
         "word1": "anger",
@@ -75,10 +72,10 @@ Use ```$[var]...$[]``` pair to select elements in data model and loop them. If n
 
 	My choice is: ${question.options.1.index}
 	```
-	> Notice: ends with '$[]' is required for the template stanza.
+	> Notice: loop expression must ends with '$[]'.
 
 	* Data Model
-	```javascript
+	```json
 	{
 		"question": {
 			"title": "What's your favorite color?",
@@ -124,8 +121,7 @@ Use ```$[var]...$[]``` pair to select elements in data model and loop them. If n
 						add(new String[]{"A", "Red"});
 						add(new String[]{"B", "Green"});
 						add(new String[]{"C", "Blue"});
-					}
-					);
+					});
 				}
 			})
 		}
@@ -141,9 +137,10 @@ Use ```$[var]...$[]``` pair to select elements in data model and loop them. If n
 	```
 
 ##### Logic
-* Logic Expression
 
-    Logic expression is used to decide whether display content in it, you can have any layer nesting logic expression. Only the expression condition determined to logic true
+* Logical Expression
+
+  Logical expression is used to decide whether display content in it, you can have any layer nested logical expression. Only the expression condition determined to logic true
 
     * Template:
     ```
@@ -163,12 +160,12 @@ Use ```$[var]...$[]``` pair to select elements in data model and loop them. If n
     ```
 
     * Data Model:
-    ```
+    ```json
     {
         "logic1": true,
         "say": "hello github",
         "logic2": false,
-        "think": "fxxk M$"
+        "think": "goodbye"
     }
     ```
 
@@ -178,14 +175,14 @@ Use ```$[var]...$[]``` pair to select elements in data model and loop them. If n
     hello github
     ```
 
-    * Logic condition judgement for object types:
+    * Logical condition judgement for object types:
 
 Logic|String|Number|Boolean|Date|Calendar|JsonPrimitive|Collection|JsonArray|Map|JsonObject|Array
 -|-|-|-|-|-|-|-|-|-|-|-
 Logic true|Y/y/YES/yes/Yes/non-empty text|>0|true|>0|>0|true/>0|size()>0|size()>0|size()>0|size()>0|length>0
 Logic false|N/n/NO/no/No/empty text|<=0|true|=0|=0|true/<=0|size()=0|size()=0|size()=0|size()=0|length=0
 
-* Use "!" in logic expression to perform logic negation, for example:
+* Use "!" in logical expression to perform logic negation, for example:
 ```
 ?{!foo.bar}
 ?{}
@@ -232,10 +229,21 @@ $[]
 
 > Of course, you can have all these data objects nested in any way.
 
+##### Escaping
+
+If the template contains text like `${xxx}` which is not expression but the engine would recognize as expression, you can use the escaping symbol `\` to let the engine ignore them, for example:
+
+```
+$\{xxx}
+$\[xxx] $\[]
+?\{xxx} ?\{}
+```
+
+Engine will recognize them as text not expression.
 
 ##### Config
 
-* You can customize SwiftMarker by provide a ```Config``` object to it.
+* You can customize SwiftMarker by providing a ```Config``` object to it.
 ```java
 ...
 SwiftMarker swiftMarker = new SwiftMarker();
@@ -266,8 +274,9 @@ renderExpressionIfValueIsBlank| set false to avoid render expression if no value
 
 ### Release Update
 * v3.0
-  * redesign the architecture of template engine.
-  * supports nesting loop now.
+  * re-implement the template engine.
+  * supports nested loop.
+  * supports escaping.
 
 * 2020-01-31 v2.2
 	* upgrade java to 1.8
@@ -277,7 +286,7 @@ renderExpressionIfValueIsBlank| set false to avoid render expression if no value
 
 * 2019-08-24 v2.1
 	* if no data selected in loop expression, nothing will be output.
-	* fix the logic expression handle bug.
+	* fix the logical expression handle bug.
 
 * 2019-05-01 v2.0
 	* rebuild the template engine
@@ -286,9 +295,4 @@ renderExpressionIfValueIsBlank| set false to avoid render expression if no value
 	* initial release.
 
 ### Limitation
-* You can not have any reserved words in you template text, it will be recognized as expression.
-* You can not have multiple loop expression in one line.
-* Comments in the template is not supported.
-
-### Known issues
-...
+* Comments in the template is not supported yet.
