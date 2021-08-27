@@ -1,7 +1,7 @@
 package com.github.swiftech.swiftmarker;
 
 /**
- * @author Allen 2019-08-27
+ * @author swiftech 2019-08-27
  **/
 public interface LoggerListener {
 

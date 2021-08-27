@@ -24,15 +24,14 @@ import java.util.Map;
 import java.util.Stack;
 
 /**
- * 简易模板引擎
+ * 模板引擎
  * 规则：
- * ${xxx} 表示直接用对应的值进行替换
- * 如果用$[xxx]开头的表示用此行作为模板遍历数组
- * 注意：一行只能存在一个循环表达式，如果有多个，只处理第一个。
+ * ${xxx} 表示直接用对应的变量值进行替换
+ * $[xxx]和$[]表示循环，其包含的内容按照集合变量进行循环
+ * ?{xxx}和${}表示逻辑判断，其包含的内容受变量值的影响
  * <p>
- * 1. 循环可以嵌套循环
- * 2. 逻辑判断可以嵌套逻辑判断
- * 3. 循环和逻辑判断可以互相嵌套（如果逻辑判断在循环中取值的话，则取子数据集中的数据）
+ * 1. 循环和逻辑判断都可以无限制嵌套
+ * 2. 循环和逻辑判断可以互相嵌套（如果逻辑判断在循环中取值的话，则取子数据集中的数据）
  * </p>
  *
  * @author swiftech
@@ -139,8 +138,8 @@ public class TemplateEngine {
                     }
                 }
                 else {
-                    log.warn("NOT MATCHED LOGIC DIRECTIVE");
                     printStack(directiveStack);
+                    throw new RuntimeException("NOT MATCHED LOGIC DIRECTIVE");
                 }
             }
             else if (directive instanceof LoopBegin) {
@@ -151,7 +150,7 @@ public class TemplateEngine {
                     debugDirective("trim last line break", i, level);
                     boolean needTrimMore = !renderContext.trimTailLineBreak();
                     if (needTrimMore) {
-                        log.debug("fail and need more trim later");
+                        debugDirective("fail and need more trim later", i, level);
                         renderContext.setNeedMoreTrim(true); // 处理模版是以嵌套指令开始的情况
                     }
                     LoopMatrix loopMatrix = dataModelHandler.onLoop(loopBegin.getValue());
@@ -201,14 +200,10 @@ public class TemplateEngine {
                         }
                         debugDirective(String.format("== render end at %d ==", i), i, level);
                         if (level > 0) {
-                            log.debug("quiting this level: " + level);
+                            debugDirective("quiting this level: " + level, i, level);
                             return i; // 子递归时及时退出，并且告诉上一层到哪个指令是循环结束
                         }
                     }
-                }
-                else {
-                    log.warn("NOT MATCHED LOOP DIRECTIVE");
-                    printStack(directiveStack);
                 }
             }
             else if (directive instanceof Var) {
@@ -238,7 +233,7 @@ public class TemplateEngine {
      */
     private void trimMoreLineBreakAtHead() {
         if (renderContext.isNeedMoreTrim()) {
-            log.debug("trim last head line break ");
+            if (log.isDebugEnabled()) log.debug("trim last head line break ");
             renderContext.trimHeadLineBreak();
             renderContext.setNeedMoreTrim(false);
         }
@@ -276,7 +271,9 @@ public class TemplateEngine {
 
 
     private void debugDirective(String msg, int i, int level) {
-        log.debug(String.format("(%2d) %s %s", i, StringUtils.repeat('-', level * 2), msg));
+        if (log.isDebugEnabled()) {
+            log.debug(String.format("(%2d) %s %s", i, StringUtils.repeat('-', level * 2), msg));
+        }
     }
 
     private void printStack(Stack<Directive> directiveStack) {

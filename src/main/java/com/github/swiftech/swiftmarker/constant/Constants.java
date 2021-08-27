@@ -1,7 +1,7 @@
 package com.github.swiftech.swiftmarker.constant;
 
 /**
- * @author Allen 2018-12-04
+ * @author swiftech 2018-12-04
  **/
 public interface Constants {
     String EXP_LOGIC_END = "?{}";

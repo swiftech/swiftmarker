@@ -2,7 +2,7 @@
 
 SwiftMarker是一个轻量级的模板引擎
 
-> 本项目基于 Apache license 发布, 目前正在 ***开发中***
+> 本项目基于 Apache license 发布
 
 
 ### 特性
@@ -14,9 +14,7 @@ SwiftMarker是一个轻量级的模板引擎
 * 逻辑表达式
 
 ### 依赖
-* java 1.7+
-* commons-lang3 3.7+
-* gson 2.8+
+* JDK 8
 
 ### Maven
 
@@ -24,6 +22,6 @@ SwiftMarker是一个轻量级的模板引擎
 <dependency>
 	<groupId>com.github.swiftech</groupId>
 	<artifactId>swiftmarker</artifactId>
-	<version>2.1</version>
+	<version>3.0</version>
 </dependency>
 ```

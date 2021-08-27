@@ -10,7 +10,7 @@ import org.apache.commons.lang3.StringUtils;
  * foo.bar: 表示 foo 对象的子对象 bar
  * foo[x].bar: 表示 foo.... TODO
  * 限制：目前只支持 JsonObject，不支持 JsonArray
- * allen
+ * swiftech
  *
  */
 public class GsonUtils {

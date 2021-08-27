@@ -94,6 +94,22 @@ public class Logger {
         }
     }
 
+    public boolean isTraceEnabled() {
+        return level >= LEVEL_TRACE;
+    }
+
+    public boolean isDebugEnabled() {
+        return level >= LEVEL_DEBUG;
+    }
+
+    public boolean isInfoEnabled() {
+        return level >= LEVEL_INFO;
+    }
+
+    public boolean isWarnEnabled() {
+        return level >= LEVEL_WARN;
+    }
+
     public void data(String data) {
         if (level == LEVEL_DEBUG) {
             System.out.println("--------------------------------");

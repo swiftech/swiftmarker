@@ -52,6 +52,18 @@ public class LogicTest extends BaseResourceTest {
     }
 
     @Test
+    public void testLogicWithLoopSimple() {
+        String s = super.runFromResourceAndAssert("logic/with_loop_simple", "logic/with_loop");
+        log.data(s);
+    }
+
+    @Test
+    public void testLogicWithLoopSimpleEmpty() {
+        String s = super.runFromResourceAndAssert("logic/with_loop_simple", "no_data", "no_output");
+        log.data(s);
+    }
+
+    @Test
     public void testLogicWithLoop() {
         String s = super.runFromResourceAndAssert("logic/with_loop");
         log.data(s);
@@ -70,7 +82,6 @@ public class LogicTest extends BaseResourceTest {
     public void testNestLogic2lTrue() {
         String rendered = runFromResourceAndAssert("logic/2l", "logic/2l_true", "logic/2l_true");
         log.data(rendered);
-
     }
 
     /**

@@ -5,7 +5,7 @@ import java.util.Stack;
 /**
  * 模板引擎上下文，包括：渲染缓存，换行处理标记
  *
- * @author Allen 2018-12-03
+ * @author swiftech 2018-12-03
  **/
 public class RenderContext {
 

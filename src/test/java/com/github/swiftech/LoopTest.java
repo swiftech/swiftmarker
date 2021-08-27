@@ -198,6 +198,14 @@ public class LoopTest extends BaseResourceTest {
         log.data(rendered);
     }
 
+
+    @Test
+    public void testNestedLogicNoData() {
+        String rendered = super.runFromResourceAndAssert("loop/nested_logic", "no_data", "loop/nested_no_data");
+        log.data(rendered);
+    }
+
+
     /**
      * 测试循环嵌套逻辑（全局变量）
      */

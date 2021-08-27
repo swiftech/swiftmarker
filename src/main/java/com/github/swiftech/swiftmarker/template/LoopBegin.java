@@ -1,7 +1,7 @@
 package com.github.swiftech.swiftmarker.template;
 
 /**
- * @author allen
+ * @author swiftech
  */
 public class LoopBegin extends NestableDirective implements Begin {
 
