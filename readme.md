@@ -4,23 +4,20 @@ SwiftMarker is a lightweight template engine.
 
 SwiftMarker是一个轻量级的模板引擎
 
-> This project is published under Apache license
-
 
 ### Features
 * Lightweight and few dependencies.
-* Simple and easy to use but flexible. Only support basic expressions so that it can run fast.
+* Simple and easy to use but flexible. 
+* Supports loop expression, logical expression and nested expression.
 * You can simply use dotted name like ```foo.bar``` to select params in data model.
 * Multiple types are supported to composite data model: array, ```List```, ```JsonArray```, ```Map```, ```JsonObject``` and even plain Bean object. you can combine them freely.
-* Loop expression
-* Logical expression
 
 ### Dependencies
 * JDK 8+
 
 ### Tutorial
 
-##### Initialize
+##### Quick Start
 
 ```java
 String strTemplate = "......";
@@ -58,124 +55,124 @@ anger leads to hate,
 hate leads to suffering.
 ```
 
-###### Loop
+###### Loop Expression
+
 Use ```$[var]...$[]``` pair to select elements in data model and loop them. If no any elements selected, anything between them will not be rendered.
 
 * loop expression with key-value elements
 
-	Use ```$[]``` to select array/JsonArray/List in data model and use ```${}``` to select params in key-value element. To select params in the loop the expression must starts with `.`, expression in the loop starts without `.` will select params from the global data model.
+Use ```$[]``` to select array/JsonArray/List in data model and use ```${}``` to select params in key-value element. To select params in the loop the expression must starts with `.`, expression in the loop starts without `.` will select params from the global data model.
 
-	* Template
-	```
-	${question.title}
-	$[question.options]${.index}: ${.option}$[]
+* Template
+```
+${question.title}
+$[question.options]${.index}: ${.option}$[]
 
-	My choice is: ${question.options.1.index}
-	```
-	> Notice: loop expression must ends with '$[]'.
+My choice is: ${question.options.1.index}
+```
+> Notice: loop expression must ends with '$[]'.
 
-	* Data Model
-	```json
-	{
-		"question": {
-			"title": "What's your favorite color?",
-			"options": [
-				{"index": "A", "option": "Red"},
-				{"index": "B", "option": "Green"},
-				{"index": "C", "option": "Blue"}
-			]			
-		}
+* Data Model
+```json
+{
+	"question": {
+		"title": "What's your favorite color?",
+		"options": [
+			{"index": "A", "option": "Red"},
+			{"index": "B", "option": "Green"},
+			{"index": "C", "option": "Blue"}
+		]			
 	}
-	```
+}
+```
 
-	* Result
-	```
-	What's your favorite color?
-	A: Red
-	B: Green
-	C: Blue
+* Result
+```
+What's your favorite color?
+A: Red
+B: Green
+C: Blue
 
-	My choice is: B
-	```
+My choice is: B
+```
 
-	> Notice: The line only contains the '$[]' placeholder will not output a new line.
+> Notice: The line only contains the '$[]' placeholder will not output a new line.
 
 
 * Loop expression with array/JsonArray/List element
-	If the array selected contains array/JsonArray/List, use ```${.0}```, ```${.1}```... to select params in the elements.
 
-	* Template
-	```
-	${question.title}
-	$[question.options]${.0}: ${.1}$[]
-	```
+If the array selected contains array/JsonArray/List, use ```${.0}```, ```${.1}```... to select params in the elements.
 
-	* Data Model
-	```java
-	Map dataMode = new HashMap() {
-		{
-			put("question", new HashMap() {
-				{
-					put("title", "What's your favorite color?");
-					put("options": new ArrayList(){
-						add(new String[]{"A", "Red"});
-						add(new String[]{"B", "Green"});
-						add(new String[]{"C", "Blue"});
-					});
-				}
-			})
-		}
-	};
-	```
+* Template
+```
+${question.title}
+$[question.options]${.0}: ${.1}$[]
+```
 
-	* Result
-	```
-	What's your favorite color?
-	A: Red
-	B: Green
-	C: Blue
-	```
+* Data Model
+```java
+Map dataMode = new HashMap() {
+	{
+		put("question", new HashMap() {
+			{
+				put("title", "What's your favorite color?");
+				put("options": new ArrayList(){
+					add(new String[]{"A", "Red"});
+					add(new String[]{"B", "Green"});
+					add(new String[]{"C", "Blue"});
+				});
+			}
+		})
+	}
+};
+```
 
-##### Logic
+* Result
+```
+What's your favorite color?
+A: Red
+B: Green
+C: Blue
+```
 
-* Logical Expression
+##### Logical Expression
 
-  Logical expression is used to decide whether display content in it, you can have any layer nested logical expression. Only the expression condition determined to logic true
+Logical expression is used to decide whether display content in it, you can have any layer nested logical expression. Only the expression condition determined to logic true
 
-    * Template:
-    ```
-    ?{logic1}
-    ${say}
-    ?{}
+* Template:
+```
+?{logic1}
+${say}
+?{}
+?{logic2}
+${think}
+?{}
+
+?{logic1}
+${say}
     ?{logic2}
-    ${think}
+${think}
     ?{}
+?{}
+```
 
-    ?{logic1}
-    ${say}
-        ?{logic2}
-    ${think}
-        ?{}
-    ?{}
-    ```
+* Data Model:
+```json
+{
+    "logic1": true,
+    "say": "hello github",
+    "logic2": false,
+    "think": "goodbye"
+}
+```
 
-    * Data Model:
-    ```json
-    {
-        "logic1": true,
-        "say": "hello github",
-        "logic2": false,
-        "think": "goodbye"
-    }
-    ```
+* Result:
+```
+hello github
+hello github
+```
 
-    * Result:
-    ```
-    hello github
-    hello github
-    ```
-
-    * Logical condition judgement for object types:
+* Logical condition judgement for object types:
 
 Logic|String|Number|Boolean|Date|Calendar|JsonPrimitive|Collection|JsonArray|Map|JsonObject|Array
 -|-|-|-|-|-|-|-|-|-|-|-
@@ -187,7 +184,7 @@ Logic false|N/n/NO/no/No/empty text|<=0|true|=0|=0|true/<=0|size()=0|size()=0|si
 ?{!foo.bar}
 ?{}
 ```
-
+or
 ```
 $[collection]
 ?{!.foo.bar}
@@ -198,34 +195,34 @@ $[]
 
 * Other supported data model object types
 
-	* Map
-	```java
-	Map m = new HashMap() {
-		{
-			put("yoda", new HashMap() {
-				{
-					put("word1", "anger");
-					put("word2", "hate");
-				}
-			})
-		}
-	};
-	swiftMarker.render(m);
-	```
+* Map
+```java
+Map m = new HashMap() {
+	{
+		put("yoda", new HashMap() {
+			{
+				put("word1", "anger");
+				put("word2", "hate");
+			}
+		})
+	}
+};
+swiftMarker.render(m);
+```
 
-	* Plain Bean Object
-	```java
-	public class Yoda{
-		YodaWords yoda;
-	}
-	public class YodaWords {
-		String word1 = "anger";
-		String word2 = "hate";
-	}
-	Yoda yoda = new Yoda();
-	......
-	swiftMarker.render(yoda);
-	```
+* Plain Bean Object
+```java
+public class Yoda{
+	YodaWords yoda;
+}
+public class YodaWords {
+	String word1 = "anger";
+	String word2 = "hate";
+}
+Yoda yoda = new Yoda();
+......
+swiftMarker.render(yoda);
+```
 
 > Of course, you can have all these data objects nested in any way.
 
@@ -239,7 +236,7 @@ $\[xxx] $\[]
 ?\{xxx} ?\{}
 ```
 
-Engine will recognize them as text not expression.
+Engine will recognize them as text instead of expression.
 
 ##### Config
 
