@@ -15,7 +15,7 @@ public class PerformanceTest extends BaseResourceTest {
      */
     @Test
     public void testPerformance() {
-        int repeat = 10000;
+        int repeat = 1;
         Logger.getInstance().setLevel(Logger.LEVEL_WARN);
         engine.setTemplate(this.loadTemplate("practice/entity_field"));
         String json = this.loadJsonData("practice/entity_field");
