@@ -70,7 +70,8 @@ $[question.options]${.index}: ${.option}$[]
 
 My choice is: ${question.options.1.index}
 ```
-> Notice: loop expression must ends with '$[]'.
+
+> Notice: loop expression must ends with ```$[]```.
 
 * Data Model
 ```json
@@ -96,7 +97,7 @@ C: Blue
 My choice is: B
 ```
 
-> Notice: The line only contains the '$[]' placeholder will not output a new line.
+> Notice: The line only contains the ```$[]``` placeholder will not output a new line.
 
 
 * Loop expression with array/JsonArray/List element
@@ -236,7 +237,7 @@ $\[xxx] $\[]
 ?\{xxx} ?\{}
 ```
 
-Engine will recognize them as text instead of expression.
+The engine will recognize them as text instead of expression.
 
 ##### Config
 
