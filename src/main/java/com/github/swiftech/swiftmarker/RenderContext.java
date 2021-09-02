@@ -67,6 +67,11 @@ public class RenderContext {
         return buf;
     }
 
+    /**
+     * Trim the line break of the buffer on the top of stack.
+     *
+     * @return
+     */
     public boolean trimTailLineBreak() {
         StringBuilder buf = getBuffer();
         if (buf == null || buf.length() == 0) {

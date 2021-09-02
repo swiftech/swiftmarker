@@ -25,6 +25,11 @@ public abstract class NestableDirective extends Directive {
                 && (next == null || next.isStartsWithLineBreak());
     }
 
+    /**
+     * Line breaks exists before and after this directive.
+     *
+     * @return
+     */
     public boolean isWrappedWithLineBreak() {
         return (previous == null || previous.isEndsWithLineBreak())
                 && (next == null || next.isStartsWithLineBreak());

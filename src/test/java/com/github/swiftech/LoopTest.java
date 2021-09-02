@@ -63,6 +63,12 @@ public class LoopTest extends BaseResourceTest {
         log.data(rendered);
     }
 
+    @Test
+    public void testMultiLoopInLine() {
+        String rendered = super.runFromResourceAndAssert("loop/multi_in_line", "loop/basic");
+        log.data(rendered);
+    }
+
     /**
      * 测试循环表达式中变量的作用域
      */

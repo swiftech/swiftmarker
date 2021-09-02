@@ -39,58 +39,58 @@ public class Logger {
     }
 
     public void error(String msg) {
-        if (level <= LEVEL_ERROR) {
-            if (loggerListener == null) {
+        if (loggerListener == null) {
+            if (level <= LEVEL_ERROR) {
                 System.out.printf("[SwiftMarker]   [ERR] %s%n", msg);
             }
-            else {
+        }
+        else {
 
-                loggerListener.onError(String.format("[SwiftMarker] %s", msg));
-            }
+            loggerListener.onError(String.format("[SwiftMarker] %s", msg));
         }
     }
 
     public void warn(String msg) {
-        if (level <= LEVEL_WARN) {
-            if (loggerListener == null) {
+        if (loggerListener == null) {
+            if (level <= LEVEL_WARN) {
                 System.out.printf("[SwiftMarker]  [WARN] %s%n", msg);
             }
-            else {
-                loggerListener.onWarn(String.format("[SwiftMarker] %s", msg));
-            }
+        }
+        else {
+            loggerListener.onWarn(String.format("[SwiftMarker] %s", msg));
         }
     }
 
     public void info(String msg) {
-        if (level <= LEVEL_INFO) {
-            if (loggerListener == null) {
+        if (loggerListener == null) {
+            if (level <= LEVEL_INFO) {
                 System.out.printf("[SwiftMarker]  [INFO] %s%n", msg);
             }
-            else {
-                loggerListener.onInfo(String.format("[SwiftMarker] %s", msg));
-            }
+        }
+        else {
+            loggerListener.onInfo(String.format("[SwiftMarker] %s", msg));
         }
     }
 
     public void debug(String msg) {
-        if (level <= LEVEL_DEBUG) {
-            if (loggerListener == null) {
+        if (loggerListener == null) {
+            if (level <= LEVEL_DEBUG) {
                 System.out.printf("[SwiftMarker] [DEBUG] %s%n", msg);
             }
-            else {
-                loggerListener.onDebug(String.format("[SwiftMarker] %s", msg));
-            }
+        }
+        else {
+            loggerListener.onDebug(String.format("[SwiftMarker] %s", msg));
         }
     }
 
     public void trace(String msg) {
-        if (level <= LEVEL_TRACE) {
-            if (loggerListener == null) {
+        if (loggerListener == null) {
+            if (level <= LEVEL_TRACE) {
                 System.out.printf("[SwiftMarker] [TRACE] %s%n", msg);
             }
-            else {
-                loggerListener.onTrace(String.format("[SwiftMarker] %s", msg));
-            }
+        }
+        else {
+            loggerListener.onTrace(String.format("[SwiftMarker] %s", msg));
         }
     }
 
@@ -111,7 +111,8 @@ public class Logger {
     }
 
     public void data(String data) {
-        if (level == LEVEL_DEBUG) {
+        if (isTraceEnabled()) {
+            this.trace("Template: ");
             System.out.println("--------------------------------");
             System.out.println(data);
             System.out.println("--------------------------------");

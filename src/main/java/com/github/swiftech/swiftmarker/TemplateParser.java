@@ -209,10 +209,10 @@ public class TemplateParser {
             }
         });
         pushStanza();
-        log.debug("Show template parse results: ");
+        log.trace("Show template parse results: ");
         for (int i = 0; i < parseResult.size(); i++) {
             Directive directive = parseResult.get(i);
-            log.debug(String.format("[%2d] %s", i, directive));
+            log.trace(String.format("[%2d] %s", i, directive));
         }
         return parseResult;
     }

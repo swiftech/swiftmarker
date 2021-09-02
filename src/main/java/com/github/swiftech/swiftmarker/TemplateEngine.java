@@ -74,7 +74,6 @@ public class TemplateEngine {
         log.info("====  Template Engine Start to Process  ====");
         log.info("Config: ");
         log.info("  Output line breaker:" + (StringUtils.LF.equals(config.getOutputLineBreaker()) ? "LF" : "CRLF"));
-        log.info("Template: ");
         log.data(template);
         TemplateParser templateParser = new TemplateParser();
         this.directives = templateParser.parse(this.toString(), this.template);
@@ -82,8 +81,9 @@ public class TemplateEngine {
             throw new RuntimeException("Template is invalid");
         }
         StackDataModelHandler dataHandler = new StackDataModelHandler(dataModel, rootDataModel, processContext);
-        log.info("== Start to process rendering ==");
+        log.debug("== Start to process rendering ==");
         this.render(0, new Stack<>(), dataHandler, 0);
+        log.debug("");
         return renderContext.popBuffer().toString();
     }
 
@@ -147,11 +147,13 @@ public class TemplateEngine {
                 // 从当前模型中获取集合，将集合元素倒序压入堆栈
                 if (isTopDirectiveAvailable(directiveStack)) {
                     LoopBegin loopBegin = (LoopBegin) directive;
-                    debugDirective("trim last line break", i, level);
-                    boolean needTrimMore = !renderContext.trimTailLineBreak();
-                    if (needTrimMore) {
-                        debugDirective("fail and need more trim later", i, level);
-                        renderContext.setNeedMoreTrim(true); // 处理模版是以嵌套指令开始的情况
+                    if (loopBegin.isWrappedWithLineBreak()) {
+                        debugDirective("trim last line break", i, level);
+                        boolean needTrimMore = !renderContext.trimTailLineBreak();
+                        if (needTrimMore) {
+                            debugDirective("fail and need more trim later", i, level);
+                            renderContext.setNeedMoreTrim(true); // 处理模版是以嵌套指令开始的情况
+                        }
                     }
                     LoopMatrix loopMatrix = dataModelHandler.onLoop(loopBegin.getValue());
                     List<Map<String, Object>> matrix = loopMatrix.getMatrix();

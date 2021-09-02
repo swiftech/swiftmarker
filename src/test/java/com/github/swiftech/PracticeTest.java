@@ -1,5 +1,6 @@
 package com.github.swiftech;
 
+import com.github.swiftech.swiftmarker.ProcessContext;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -11,6 +12,17 @@ public class PracticeTest extends BaseResourceTest {
     public void setup() {
 //        log.setLevel(Logger.LEVEL_DEBUG);
         engine.setConfig(config);
+    }
+
+    @Test
+    public void testVerySimple(){
+        String temp = "/template/backend/{locale}/src/main/java/model/entity/Base${project_name}Entity.java.tpl";
+        super.engine.setTemplate(temp);
+        Object model = new Object(){
+            String project_name = "FooBar";
+        };
+        String result = super.engine.process(model, new ProcessContext());
+        System.out.println(result);
     }
 
     /**
