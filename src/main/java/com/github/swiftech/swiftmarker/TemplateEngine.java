@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2020 Yuxing Wang.
+ * Copyright 2018-2021 Yuxing Wang.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Stack;
 
 /**
  * 模板引擎
@@ -31,7 +30,8 @@ import java.util.Stack;
  * ?{xxx}和${}表示逻辑判断，其包含的内容受变量值的影响
  * <p>
  * 1. 循环和逻辑判断都可以无限制嵌套
- * 2. 循环和逻辑判断可以互相嵌套（如果逻辑判断在循环中取值的话，则取子数据集中的数据）
+ * 2. 循环和逻辑判断可以互相嵌套
+ * 3. 循环中可以取子模型中的数据（用.号开始的变量表示）
  * </p>
  *
  * @author swiftech
@@ -82,7 +82,8 @@ public class TemplateEngine {
         }
         StackDataModelHandler dataHandler = new StackDataModelHandler(dataModel, rootDataModel, processContext);
         log.debug("== Start to process rendering ==");
-        this.render(0, new Stack<>(), dataHandler, 0);
+
+        this.render(0, new DirectiveStack(), dataHandler, 0);
         log.debug("");
         return renderContext.popBuffer().toString();
     }
@@ -94,7 +95,7 @@ public class TemplateEngine {
      * @param level            递归层级，最上层是0，子递归需要在遇到循环结束的时候 break
      * @return 返回遇到循环结束的时候的指令位置（也就是上一层递归需要跳到哪个指令之后开始执行）
      */
-    private int render(int directiveCursor, Stack<Directive> directiveStack, StackDataModelHandler dataModelHandler, int level) {
+    private int render(int directiveCursor, DirectiveStack directiveStack, StackDataModelHandler dataModelHandler, int level) {
         log.debug(String.format("render from %d", directiveCursor));
         renderContext.createBuffer();
         // 从给定的指令位置开始
@@ -104,7 +105,7 @@ public class TemplateEngine {
             if (directive instanceof LogicBegin) {
                 debugDirective("logic begin ->", i, level);
                 LogicBegin logicBegin = (LogicBegin) directive;
-                if (isTopDirectiveAvailable(directiveStack)) {
+                if (directiveStack.isTopAvailable()) {
                     boolean available = dataModelHandler.isLogicalTrueOrFalse(logicBegin.getValue());
                     debugDirective(available ? "available" : "not available", i, level);
                     logicBegin.setAvailable(available);
@@ -138,14 +139,14 @@ public class TemplateEngine {
                     }
                 }
                 else {
-                    printStack(directiveStack);
+                    directiveStack.printStack();
                     throw new RuntimeException("NOT MATCHED LOGIC DIRECTIVE");
                 }
             }
             else if (directive instanceof LoopBegin) {
                 debugDirective("loop begin ->", i, level);
                 // 从当前模型中获取集合，将集合元素倒序压入堆栈
-                if (isTopDirectiveAvailable(directiveStack)) {
+                if (directiveStack.isTopAvailable()) {
                     LoopBegin loopBegin = (LoopBegin) directive;
                     if (loopBegin.isWrappedWithLineBreak()) {
                         debugDirective("trim last line break", i, level);
@@ -172,7 +173,7 @@ public class TemplateEngine {
                         debugDirective(String.format("loop: %s", loopBegin.getValue()), i, level);
                         for (int j = 0; j < loopMatrix.getMatrix().size(); j++) {
                             // == 递归 ==
-                            Stack<Directive> subStack = new Stack<>();
+                            DirectiveStack subStack = new DirectiveStack();
                             subStack.push(loopBegin); // for matching the loop end in sub-func
                             debugDirective(String.format("call %dth rendering recursively", j), i, level);
                             consumedAt = this.render(i + 1, subStack, dataModelHandler, level + 1);
@@ -188,8 +189,8 @@ public class TemplateEngine {
             else if (directive instanceof LoopEnd) {
                 debugDirective("<- loop end", i, level);
                 LoopEnd loopEnd = (LoopEnd) directive;
-                if (isTopDirectiveLoopBegin(directiveStack)) {
-                    if (isTopDirectiveAvailable(directiveStack)) {
+                if (directiveStack.isTopLoopBegin()) {
+                    if (directiveStack.isTopAvailable()) {
                         loopEnd.setAvailable(true);
                         debugDirective("pop last model", i, level);
                         dataModelHandler.popDataModel();
@@ -209,14 +210,14 @@ public class TemplateEngine {
                 }
             }
             else if (directive instanceof Var) {
-                if (isTopDirectiveAvailable(directiveStack)) {
+                if (directiveStack.isTopAvailable()) {
                     String rendered = dataModelHandler.onKey(directive.getValue());
                     debugDirective(String.format("var replacement: %s = '%s'", directive.getValue(), rendered), i, level);
                     renderContext.appendToBuffer(rendered);
                 }
             }
             else if (directive instanceof Stanza) {
-                if (isTopDirectiveAvailable(directiveStack)) {
+                if (directiveStack.isTopAvailable()) {
                     Stanza stanza = (Stanza) directive;
                     if (stanza.getValue() != null) {
                         debugDirective("append stanza ", i, level);
@@ -241,48 +242,11 @@ public class TemplateEngine {
         }
     }
 
-    /**
-     * @param directiveStack
-     * @return true if not exist
-     */
-    private boolean isTopDirectiveAvailable(Stack<Directive> directiveStack) {
-        if (!directiveStack.isEmpty()) {
-            Directive lastDirective = directiveStack.peek();
-            if (lastDirective instanceof NestableDirective) {
-                return ((NestableDirective) lastDirective).isAvailable();
-            }
-        }
-        return true;
-    }
-
-    private boolean isTopDirectiveLoopBegin(Stack<Directive> directiveStack) {
-        if (!directiveStack.isEmpty()) {
-            Directive lastDirective = directiveStack.peek();
-            return lastDirective instanceof LoopBegin;
-        }
-        return false;
-    }
-
-    private boolean isTopDirectiveLogicBegin(Stack<Directive> directiveStack) {
-        if (!directiveStack.isEmpty()) {
-            Directive lastDirective = directiveStack.peek();
-            return lastDirective instanceof LogicBegin;
-        }
-        return false;
-    }
-
-
     private void debugDirective(String msg, int i, int level) {
         if (log.isDebugEnabled()) {
             log.debug(String.format("(%2d) %s %s", i, StringUtils.repeat('-', level * 2), msg));
         }
     }
-
-    private void printStack(Stack<Directive> directiveStack) {
-        directiveStack.forEach(directive -> System.out.printf("%s(%s),", directive.getClass().getSimpleName(), (directive instanceof NestableDirective ? ((NestableDirective) directive).isAvailable() : "")));
-        System.out.println();
-    }
-
 
     public void setTemplate(String template) {
         this.template = template;
