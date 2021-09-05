@@ -1,6 +1,7 @@
 package com.github.swiftech;
 
 import com.github.swiftech.swiftmarker.Logger;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -108,4 +109,11 @@ public class LogicTest extends BaseResourceTest {
         String s = super.runFromResourceAndAssert("logic/practice");
     }
 
+
+    @Test
+    public void testLogicWithLoopLame() {
+        Assert.assertThrows(RuntimeException.class
+                , () -> runFromResourceAndAssert("logic/with_loop_lame", "logic/with_loop", "logic/with_loop_lame"));
+
+    }
 }

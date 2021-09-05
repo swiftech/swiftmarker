@@ -9,4 +9,9 @@ public class LogicEnd extends NestableDirective implements End {
         super(null);
     }
 
+    @Override
+    public String toExpression() {
+        return "?{}";
+    }
+
 }

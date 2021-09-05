@@ -17,4 +17,10 @@ public class Var extends Directive{
                 ", value='" + value + '\'' +
                 '}';
     }
+
+    @Override
+    public String toExpression() {
+        return String.format("${%s}", value);
+    }
+
 }

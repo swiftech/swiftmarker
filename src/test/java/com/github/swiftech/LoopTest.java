@@ -7,6 +7,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -239,5 +240,10 @@ public class LoopTest extends BaseResourceTest {
         log.data(rendered);
     }
 
+    @Test
+    public void testLoopWithLogicLame() {
+        Assert.assertThrows(RuntimeException.class
+                , () -> runFromResourceAndAssert("logic/with_logic_lame", "logic/with_loop", "logic/with_logic_lame"));
+    }
 
 }

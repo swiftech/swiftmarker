@@ -25,6 +25,11 @@ public class TemplateParser {
     private final List<Directive> parseResult = new LinkedList<>();
 
     /**
+     * Directive stack to check nestable expression's matching.
+     */
+    private final DirectiveStack directiveStack = new DirectiveStack();
+
+    /**
      * Cache to compose expressions and stanzas
      */
     private StringBuilder stanzaBuf = new StringBuilder();
@@ -252,9 +257,11 @@ public class TemplateParser {
             log.debug(String.format("Expression: %s", expressionBuf));
             if (sm.isState(id, S_IN_EXP_LOGIC)) {
                 directive = new LogicBegin(expressionBuf.toString());
+                directiveStack.push(directive);
             }
             else if (sm.isState(id, S_IN_EXP_LOOP)) {
                 directive = new LoopBegin(expressionBuf.toString());
+                directiveStack.push(directive);
             }
             else {
                 directive = new Var(expressionBuf.toString());
@@ -263,11 +270,20 @@ public class TemplateParser {
         else {
             if (sm.isState(id, S_IN_LOGIC)) {
                 directive = new LogicEnd();
+                if (!directiveStack.isTopLogicBegin()){
+                    throw new RuntimeException(String.format("Expression '%s' is not closed", directiveStack.peek().toExpression()));
+                }
+                directiveStack.pop();
             }
             else if (sm.isState(id, S_IN_LOOP)) {
                 directive = new LoopEnd();
+                if (!directiveStack.isTopLoopBegin()){
+                    throw new RuntimeException(String.format("Expression '%s' is not closed", directiveStack.peek().toExpression()));
+                }
+                directiveStack.pop();
             }
         }
+        // Collect directive and link with previous one.
         if (directive != null) {
             if (parseResult.size() > 0) {
                 Directive preDirective = parseResult.get(parseResult.size() - 1);

@@ -1,3 +1,6 @@
+* 2021-09-06 v3.0.1
+  * fixed the loop expression bug.
+  * add template validation for nestable expressions,
 
 * 2021-08-26 v3.0
     * re-implement the template engine.

@@ -89,6 +89,10 @@ public abstract class Directive {
         return this instanceof Stanza;
     }
 
+    public String toExpression() {
+        return value;
+    }
+
     @Override
     public String toString() {
         return this.getClass().getSimpleName();

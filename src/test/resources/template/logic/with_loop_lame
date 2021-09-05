@@ -1,0 +1,7 @@
+====
+?{show}
+${hello}
+$[options]
+${.key}
+?{}
+====

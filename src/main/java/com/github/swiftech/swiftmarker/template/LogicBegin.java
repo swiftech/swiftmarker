@@ -9,4 +9,9 @@ public class LogicBegin extends NestableDirective implements Begin {
         super(value);
     }
 
+    @Override
+    public String toExpression() {
+        return String.format("?{%s}", value);
+    }
+
 }

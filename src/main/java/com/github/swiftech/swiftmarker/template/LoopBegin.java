@@ -15,4 +15,10 @@ public class LoopBegin extends NestableDirective implements Begin {
         super.isAvailable = isAvailable;
     }
 
+    @Override
+    public String toExpression() {
+        return String.format("$[%s]", value);
+    }
+
+
 }

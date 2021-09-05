@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration xmlns:xi="http://www.w3.org/2001/XInclude"
-               status="WARN" name="arya-admin"
-               xmlns="http://logging.apache.org/log4j/2.0/config">
+               status="WARN" xmlns="http://logging.apache.org/log4j/2.0/config">
     <Properties>
         <Property name="webapp_name">swiftmarker</Property>
     </Properties>
