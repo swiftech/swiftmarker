@@ -109,6 +109,11 @@ public class LogicTest extends BaseResourceTest {
         String s = super.runFromResourceAndAssert("logic/practice");
     }
 
+    @Test
+    public void testLame() {
+        Assert.assertThrows(RuntimeException.class
+                , () -> runFromResourceAndAssert("logic/lame", "logic/basic"));
+    }
 
     @Test
     public void testLogicWithLoopLame() {

@@ -130,8 +130,8 @@ public class TemplateParser {
             else if (c == '?') {
                 this.sm.post(id, S_PENDING_LOGIC, (char) c);
             }
-            else if (c == '\\'){
-                this.sm.post(id, S_ESCAPING, (char)c);
+            else if (c == '\\') {
+                this.sm.post(id, S_ESCAPING, (char) c);
             }
             else if (c == '[') {
                 if (sm.isState(id, S_PENDING_OTHER)) {
@@ -215,9 +215,18 @@ public class TemplateParser {
         });
         pushStanza();
         log.trace("Show template parse results: ");
-        for (int i = 0; i < parseResult.size(); i++) {
-            Directive directive = parseResult.get(i);
-            log.trace(String.format("[%2d] %s", i, directive));
+        if (!directiveStack.isEmpty()) {
+            StringBuffer sb = new StringBuffer();
+            while (directiveStack.peek() != null) {
+                sb.append(String.format("Expression '%s' is not closed\n", directiveStack.pop().toExpression()));
+            }
+            throw new RuntimeException(sb.toString().trim());
+        }
+        else {
+            for (int i = 0; i < parseResult.size(); i++) {
+                Directive directive = parseResult.get(i);
+                log.trace(String.format("[%2d] %s", i, directive));
+            }
         }
         return parseResult;
     }
@@ -270,14 +279,14 @@ public class TemplateParser {
         else {
             if (sm.isState(id, S_IN_LOGIC)) {
                 directive = new LogicEnd();
-                if (!directiveStack.isTopLogicBegin()){
+                if (!directiveStack.isTopLogicBegin()) {
                     throw new RuntimeException(String.format("Expression '%s' is not closed", directiveStack.peek().toExpression()));
                 }
                 directiveStack.pop();
             }
             else if (sm.isState(id, S_IN_LOOP)) {
                 directive = new LoopEnd();
-                if (!directiveStack.isTopLoopBegin()){
+                if (!directiveStack.isTopLoopBegin()) {
                     throw new RuntimeException(String.format("Expression '%s' is not closed", directiveStack.peek().toExpression()));
                 }
                 directiveStack.pop();

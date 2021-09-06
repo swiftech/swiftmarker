@@ -24,7 +24,16 @@ public class DirectiveStack {
     }
 
     public Directive peek() {
-        return directiveStack.peek();
+        try {
+            return directiveStack.peek();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public boolean isEmpty() {
+        return directiveStack.isEmpty();
     }
 
     public boolean isTopLogicBegin() {

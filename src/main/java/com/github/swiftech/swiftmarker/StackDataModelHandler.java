@@ -157,21 +157,27 @@ public class StackDataModelHandler implements DataModelHandler {
     }
 
     /**
-     * 确定是局部变量还是全局变量
+     * 获取局部变量或者全局变量
      *
      * @param key
      * @return
      */
     private Object parseValueLocalOrGlobal(String key) {
         Object v;
+        Object model;
         if (key.startsWith(".")) {
+            model = getTopDataModel();
             v = dataModelHelper.getValueRecursively(
-                    getTopDataModel(),
+                    model,
                     StringUtils.substringAfter(key.trim(), ".").trim(),
                     Object.class);
         }
         else {
-            v = dataModelHelper.getValueRecursively(rootDataModel, key, Object.class);
+            model = rootDataModel;
+            v = dataModelHelper.getValueRecursively(model, key, Object.class);
+        }
+        if (v == null) {
+            processContext.addMessageToCurrentGroup(String.format("No value in the data model %s by key: %s", model.getClass(), key));
         }
         return v;
     }
