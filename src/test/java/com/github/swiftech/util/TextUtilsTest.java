@@ -1,8 +1,8 @@
 package com.github.swiftech.util;
 
 import com.github.swiftech.swiftmarker.util.TextUtils;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +22,6 @@ public class TextUtilsTest {
             }
         };
         String join = TextUtils.join(l, ",");
-        Assert.assertEquals("\"aaa\",\"bbb\",\"ccc\"", join);
+        Assertions.assertEquals("\"aaa\",\"bbb\",\"ccc\"", join);
     }
 }

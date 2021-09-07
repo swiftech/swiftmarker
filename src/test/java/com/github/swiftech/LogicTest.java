@@ -1,16 +1,16 @@
 package com.github.swiftech;
 
 import com.github.swiftech.swiftmarker.Logger;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Allen 2018-11-30
  **/
 public class LogicTest extends BaseResourceTest {
 
-    @Before
+    @BeforeEach
     public void setup() {
         log.setLevel(Logger.LEVEL_DEBUG);
         engine.setConfig(config);
@@ -111,13 +111,13 @@ public class LogicTest extends BaseResourceTest {
 
     @Test
     public void testLame() {
-        Assert.assertThrows(RuntimeException.class
+        Assertions.assertThrows(RuntimeException.class
                 , () -> runFromResourceAndAssert("logic/lame", "logic/basic"));
     }
 
     @Test
     public void testLogicWithLoopLame() {
-        Assert.assertThrows(RuntimeException.class
+        Assertions.assertThrows(RuntimeException.class
                 , () -> runFromResourceAndAssert("logic/with_loop_lame", "logic/with_loop", "logic/with_loop_lame"));
 
     }

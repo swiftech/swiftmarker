@@ -1,8 +1,8 @@
 package com.github.swiftech.util;
 
 import org.apache.commons.lang3.StringUtils;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Allen 2018-11-25
@@ -31,7 +31,7 @@ public class UtilsTest {
         for (String str : strs) {
             System.out.println("'" + str + "'");
         }
-        Assert.assertEquals(13, strs.length);
+        Assertions.assertEquals(13, strs.length);
     }
 
     @Test
@@ -40,7 +40,7 @@ public class UtilsTest {
         for (String str : strs) {
             System.out.println("'" + str + "'");
         }
-        Assert.assertEquals(12, strs.length);
+        Assertions.assertEquals(12, strs.length);
 
     }
 
@@ -51,7 +51,7 @@ public class UtilsTest {
         for (String str : strs) {
             System.out.println(str);
         }
-        Assert.assertEquals(12, strs.length);
+        Assertions.assertEquals(12, strs.length);
     }
 
     @Test
@@ -61,7 +61,7 @@ public class UtilsTest {
         for (String str : strs) {
             System.out.println(str);
         }
-        Assert.assertEquals(12, strs.length);
+        Assertions.assertEquals(12, strs.length);
     }
 
 }

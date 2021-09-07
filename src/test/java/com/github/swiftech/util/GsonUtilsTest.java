@@ -3,7 +3,7 @@ package com.github.swiftech.util;
 import com.github.swiftech.swiftmarker.util.GsonUtils;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * allen

@@ -7,9 +7,9 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,7 +22,7 @@ import java.util.HashMap;
  **/
 public class LoopTest extends BaseResourceTest {
 
-    @Before
+    @BeforeEach
     public void setup() {
         log.setLevel(Logger.LEVEL_DEBUG);
         engine.setConfig(config);
@@ -242,7 +242,7 @@ public class LoopTest extends BaseResourceTest {
 
     @Test
     public void testLoopWithLogicLame() {
-        Assert.assertThrows(RuntimeException.class
+        Assertions.assertThrows(RuntimeException.class
                 , () -> runFromResourceAndAssert("logic/with_logic_lame", "logic/with_loop", "logic/with_logic_lame"));
     }
 

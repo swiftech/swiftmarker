@@ -4,7 +4,7 @@ import com.github.swiftech.swiftmarker.*;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import org.apache.commons.io.IOUtils;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -47,7 +47,7 @@ public class BaseResourceTest {
     }
 
     public void assertRender(String resName, String actual) {
-        Assert.assertEquals(String.format("验证模板%s错误", resName), loadExpect(resName), actual);
+        Assertions.assertEquals(loadExpect(resName), actual, String.format("验证模板'%s'错误", resName));
     }
 
     /**

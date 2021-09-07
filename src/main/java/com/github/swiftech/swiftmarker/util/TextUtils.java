@@ -9,6 +9,10 @@ import java.util.Collection;
  **/
 public class TextUtils {
 
+    public static boolean isWrappedWith(CharSequence str, CharSequence wrapper) {
+        return StringUtils.startsWith(str, wrapper) && StringUtils.endsWith(str, wrapper);
+    }
+
     /**
      * 依次替换掉对应的 ${xxx} 表示的标记
      *

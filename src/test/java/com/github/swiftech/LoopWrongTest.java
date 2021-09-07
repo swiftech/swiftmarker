@@ -3,9 +3,8 @@ package com.github.swiftech;
 import com.github.swiftech.swiftmarker.ProcessContext;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.function.ThrowingRunnable;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Allen 2018-12-25
@@ -32,7 +31,7 @@ public class LoopWrongTest extends BaseResourceTest {
                 "}";
         System.out.println(json);
         JsonObject jsonObject = new Gson().fromJson(json, JsonObject.class);
-        Assert.assertThrows(Exception.class, () -> {
+        Assertions.assertThrows(Exception.class, () -> {
             String s = engine.process(jsonObject, new ProcessContext());
             log.data(s);
         });

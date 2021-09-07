@@ -1,5 +1,6 @@
 package com.github.swiftech.swiftmarker;
 
+import com.github.swiftech.swiftmarker.parser.LogicalOperation;
 import com.github.swiftech.swiftmarker.util.ObjectUtils;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -62,6 +63,24 @@ public class StackDataModelHandler implements DataModelHandler {
 
     @Override
     public boolean isLogicalTrue(String key) {
+        if (StringUtils.containsAny(key, "=<>!")) {
+            return isLogicalOperationTrue(key);
+        }
+        else {
+            return isLogicalTrueSimple(key);
+        }
+    }
+
+    public boolean isLogicalOperationTrue(String expression) {
+        LogicalOperation logicExpression = new LogicalOperation(expression);
+        if (logicExpression.isValid()) {
+            Object value = this.parseValueLocalOrGlobal(logicExpression.getKey());
+            return logicExpression.evaluate(value);
+        }
+        return false;
+    }
+
+    public boolean isLogicalTrueSimple(String key) {
         Object value = this.parseValueLocalOrGlobal(key);
         if (value == null) {
             return false;
@@ -189,8 +208,8 @@ public class StackDataModelHandler implements DataModelHandler {
         // 只能用 Iterable， 因为可能返回各种对象
         Iterable dataMatrix = dataModelHelper.getValueRecursively(getTopDataModel(), loopKey, Iterable.class);
         if (dataMatrix == null || !dataMatrix.iterator().hasNext()) {
-            Logger.getInstance().warn("No collection or key-value object in the data model by key: " + loopKey);
-            processContext.addMessageToCurrentGroup("No collection or key-value object in the data model by key: " + loopKey);
+            Logger.getInstance().warn(String.format("No collection or key-value object in the data model %s by key: %s", getTopDataModel().getClass(), loopKey));
+            processContext.addMessageToCurrentGroup(String.format("No collection or key-value object in the data model %s by key: %s", getTopDataModel().getClass(), loopKey));
             return new LoopMatrix(ret);
         }
 

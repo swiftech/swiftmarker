@@ -8,7 +8,6 @@ import java.util.List;
  * @author swiftech
  **/
 public interface DataModelHandler {
-
     /**
      * 从根节点查找，是否逻辑为 true（只判断值是否为真）
      * @param key

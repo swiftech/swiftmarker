@@ -3,7 +3,7 @@ package com.github.swiftech;
 import com.github.swiftech.swiftmarker.Logger;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author swiftech

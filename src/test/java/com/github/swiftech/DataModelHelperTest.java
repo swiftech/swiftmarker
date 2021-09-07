@@ -3,8 +3,8 @@ package com.github.swiftech;
 import com.github.swiftech.swiftmarker.DataModelHelper;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Allen 2018-06-22
@@ -21,7 +21,7 @@ public class DataModelHelperTest {
         DataModelHelper dataModelHelper = new DataModelHelper();
         String s = dataModelHelper.getValueRecursively(jo1, "k1.k12", String.class);
         System.out.println("结果：" + s);
-        Assert.assertEquals("v12", s);
+        Assertions.assertEquals("v12", s);
     }
 
 }

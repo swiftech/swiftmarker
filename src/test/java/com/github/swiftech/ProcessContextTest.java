@@ -1,7 +1,7 @@
 package com.github.swiftech;
 
 import com.github.swiftech.swiftmarker.ProcessContext;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * allen

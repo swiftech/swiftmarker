@@ -1,15 +1,15 @@
 package com.github.swiftech;
 
 import com.github.swiftech.swiftmarker.Logger;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * allen
  */
 public class EscapeTest extends BaseResourceTest{
 
-    @Before
+    @BeforeEach
     public void setup() {
         log.setLevel(Logger.LEVEL_DEBUG);
         config.setDebugLevel(Logger.LEVEL_DEBUG);

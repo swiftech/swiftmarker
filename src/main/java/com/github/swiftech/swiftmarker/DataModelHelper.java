@@ -15,15 +15,6 @@ import java.util.*;
 public class DataModelHelper {
 
     /**
-     * 处理上下文
-     */
-//    protected ProcessContext2 processContext;
-//
-//    public DataModelHelper(ProcessContext2 processContext) {
-//        this.processContext = processContext;
-//    }
-
-    /**
      * 递归从数据模型容器中获取 key 对应的值。如果是数组对象，会转换成集合（Iterable）
      *
      * @param container
@@ -74,7 +65,7 @@ public class DataModelHelper {
         }
         else {
             // 未知类型
-            return null;
+            return (T)value;
         }
     }
 

@@ -193,8 +193,12 @@ $[collection]
 $[]
 ```
 
+* Logical expression also supports simple operation, like:
+  * `str = 'foo'` `str != 'foo'`
+  * `int = 9` `int > 9` `int < 9` `int >= 9` `int <= 9`
 
-* Other supported data model object types
+
+##### Other supported data model object types
 
 * Map
 ```java
