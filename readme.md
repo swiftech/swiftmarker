@@ -270,7 +270,7 @@ renderExpressionIfValueIsBlank| set false to avoid render expression if no value
 <dependency>
 	<groupId>com.github.swiftech</groupId>
 	<artifactId>swiftmarker</artifactId>
-	<version>3.0</version>
+	<version>3.0.1</version>
 </dependency>
 ```
 
