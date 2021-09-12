@@ -18,7 +18,7 @@ import java.util.HashMap;
 /**
  * 测试循环表达式
  *
- * @author Allen 2018-11-25
+ * @author swiftech 2018-11-25
  **/
 public class LoopTest extends BaseResourceTest {
 

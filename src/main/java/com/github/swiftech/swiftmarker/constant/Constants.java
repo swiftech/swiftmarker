@@ -26,12 +26,15 @@ public interface Constants {
     String S_ESCAPING = "escaping";
 
 
-    String LOGIC_EXP_EQ = "=";
-    String LOGIC_EXP_NE = "!=";
-    String LOGIC_EXP_GT = ">";
-    String LOGIC_EXP_LT = "<";
-    String LOGIC_EXP_GE = ">=";
-    String LOGIC_EXP_LE = "<=";
+    String LOGIC_OP_EQ = "=";
+    String LOGIC_OP_NE = "!=";
+    String LOGIC_OP_GT = ">";
+    String LOGIC_OP_LT = "<";
+    String LOGIC_OP_GE = ">=";
+    String LOGIC_OP_LE = "<=";
 
-    List<String> ALL_LOGIC_EXPS = Arrays.asList(LOGIC_EXP_NE, LOGIC_EXP_GE, LOGIC_EXP_LE, LOGIC_EXP_EQ, LOGIC_EXP_GT, LOGIC_EXP_LT);
+    String LOGIC_OP_AND = "&";
+    String LOGIC_OP_OR = "|";
+
+    List<String> ALL_LOGIC_EXPS = Arrays.asList(LOGIC_OP_NE, LOGIC_OP_GE, LOGIC_OP_LE, LOGIC_OP_EQ, LOGIC_OP_GT, LOGIC_OP_LT);
 }

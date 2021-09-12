@@ -6,7 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 /**
- * @author Allen 2018-11-30
+ * @author swiftech 2018-11-30
  **/
 public class LogicTest extends BaseResourceTest {
 

@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
- * @author allen
+ * @author swiftech
  */
 public class StackDataModelHandlerTest {
 
@@ -20,8 +20,8 @@ public class StackDataModelHandlerTest {
                 };
             };
         }, new ProcessContext());
-        Assertions.assertTrue(handler.isLogicalTrue("l1.l2.boolTrue"));
-        Assertions.assertFalse(handler.isLogicalTrue("l1.l2.boolFalse"));
+        Assertions.assertTrue(handler.isLogicalTrueOrFalse("l1.l2.boolTrue"));
+        Assertions.assertFalse(handler.isLogicalTrueOrFalse("l1.l2.boolFalse"));
     }
 
     @Test
@@ -34,8 +34,8 @@ public class StackDataModelHandlerTest {
                 };
             };
         }, new ProcessContext());
-        Assertions.assertTrue(handler.isLogicalTrue("l1.l2.a = 'A'"));
-        Assertions.assertFalse(handler.isLogicalTrue("l1.l2.b > 0"));
+        Assertions.assertTrue(handler.isLogicalTrueOrFalse("l1.l2.a = 'A'"));
+        Assertions.assertFalse(handler.isLogicalTrueOrFalse("l1.l2.b > 0"));
     }
 
 }

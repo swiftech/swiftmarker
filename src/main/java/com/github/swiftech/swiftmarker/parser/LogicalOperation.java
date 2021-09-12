@@ -5,23 +5,28 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 
 import java.util.Optional;
+import java.util.function.Function;
 
 import static com.github.swiftech.swiftmarker.constant.Constants.*;
 
 /**
+ * Compare value if they are numbers.
+ * If not but String, compares the length of the String.
+ * (Not support collection size yet)
+ *
  * @author swiftech
  * @since 3.1
  */
-public class LogicalOperation {
+public class LogicalOperation extends BaseOperation {
 
-    private final String expression;
     private String key;
     private String operator;
     private Object value;
     private boolean isValid = true;
 
     public LogicalOperation(String expression) {
-        this.expression = expression;
+        super(expression);
+        super.reverse = expression.startsWith("!");
         this.parseExpression();
     }
 
@@ -67,48 +72,60 @@ public class LogicalOperation {
     /**
      * Evaluate the actualValue by this operation.
      *
-     * @param actualValue
+     * @param valueGetter
      * @return
      */
-    public boolean evaluate(Object actualValue) {
-        if (!isValid || actualValue == null) {
+    @Override
+    public boolean evaluate(Function<String, Object> valueGetter) {
+        if (!isValid) {
             return false;
         }
-        if (actualValue instanceof Number) {
-            int actualV = (int) actualValue;
-            int expectV = (int) this.value;
-            switch (this.operator) {
-                case LOGIC_EXP_EQ:
-                    return this.value.equals(actualValue);
-                case LOGIC_EXP_NE:
-                    return !this.value.equals(actualValue);
-                case LOGIC_EXP_GT:
-                    return NumberUtils.compare(actualV, expectV) > 0;
-                case LOGIC_EXP_LT:
-                    return NumberUtils.compare(actualV, expectV) < 0;
-                case LOGIC_EXP_GE:
-                    return NumberUtils.compare(actualV, expectV) >= 0;
-                case LOGIC_EXP_LE:
-                    return NumberUtils.compare(actualV, expectV) <= 0;
-            }
+        if (super.reverse) {
+            super.reverse = false;
+            super.expression = super.expression.substring(1);
+            return !this.evaluate(valueGetter);
         }
         else {
-            switch (this.operator) {
-                case LOGIC_EXP_EQ:
-                    return this.value.equals(actualValue.toString());
-                case LOGIC_EXP_NE:
-                    return !this.value.equals(actualValue.toString());
-                case LOGIC_EXP_GT:
-                    return actualValue.toString().length() > this.value.toString().length();
-                case LOGIC_EXP_LT:
-                    return actualValue.toString().length() < this.value.toString().length();
-                case LOGIC_EXP_GE:
-                    return actualValue.toString().length() >= this.value.toString().length();
-                case LOGIC_EXP_LE:
-                    return actualValue.toString().length() <= this.value.toString().length();
+            Object actualValue = valueGetter.apply(this.getKey());
+            if (actualValue == null) {
+                return this.operator.equals(LOGIC_OP_NE); // 特殊处理 '!=' 的情况
             }
+            if (actualValue instanceof Number) {
+                int actualV = (int) actualValue;
+                int expectV = (int) this.value;
+                switch (this.operator) {
+                    case LOGIC_OP_EQ:
+                        return this.value.equals(actualValue);
+                    case LOGIC_OP_NE:
+                        return !this.value.equals(actualValue);
+                    case LOGIC_OP_GT:
+                        return NumberUtils.compare(actualV, expectV) > 0;
+                    case LOGIC_OP_LT:
+                        return NumberUtils.compare(actualV, expectV) < 0;
+                    case LOGIC_OP_GE:
+                        return NumberUtils.compare(actualV, expectV) >= 0;
+                    case LOGIC_OP_LE:
+                        return NumberUtils.compare(actualV, expectV) <= 0;
+                }
+            }
+            else {
+                switch (this.operator) {
+                    case LOGIC_OP_EQ:
+                        return this.value.equals(actualValue.toString());
+                    case LOGIC_OP_NE:
+                        return !this.value.equals(actualValue.toString());
+                    case LOGIC_OP_GT:
+                        return actualValue.toString().length() > this.value.toString().length();
+                    case LOGIC_OP_LT:
+                        return actualValue.toString().length() < this.value.toString().length();
+                    case LOGIC_OP_GE:
+                        return actualValue.toString().length() >= this.value.toString().length();
+                    case LOGIC_OP_LE:
+                        return actualValue.toString().length() <= this.value.toString().length();
+                }
+            }
+            return false;
         }
-        return false;
     }
 
 }

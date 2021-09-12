@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
- * @author Allen 2018-06-22
+ * @author swiftech 2018-06-22
  **/
 public class DataModelHelperTest {
 

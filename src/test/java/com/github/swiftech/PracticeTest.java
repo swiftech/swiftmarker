@@ -5,7 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 /**
- * @author Allen 2019-08-23
+ * @author swiftech 2019-08-23
  **/
 public class PracticeTest extends BaseResourceTest {
     @BeforeEach

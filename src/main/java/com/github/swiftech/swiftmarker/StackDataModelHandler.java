@@ -1,10 +1,9 @@
 package com.github.swiftech.swiftmarker;
 
-import com.github.swiftech.swiftmarker.parser.LogicalOperation;
+import com.github.swiftech.swiftmarker.parser.CompoundLogicalOperation;
+import com.github.swiftech.swiftmarker.parser.LogicalValue;
 import com.github.swiftech.swiftmarker.util.ObjectUtils;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
 import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.lang3.StringUtils;
 
@@ -52,91 +51,12 @@ public class StackDataModelHandler implements DataModelHandler {
     @Override
     public boolean isLogicalTrueOrFalse(String key) {
         // 实现逻辑非操作
-        if (key.trim().startsWith("!")) {
-            String actualKey = StringUtils.substring(key.trim(), 1);
-            return !this.isLogicalTrue(actualKey);
+        if (StringUtils.containsAny(key, "=<>&|")) {
+            return new CompoundLogicalOperation(key).evaluate(this::parseValueLocalOrGlobal);
         }
         else {
-            return this.isLogicalTrue(key.trim());
+            return new LogicalValue(key).evaluate(this::parseValueLocalOrGlobal);
         }
-    }
-
-    @Override
-    public boolean isLogicalTrue(String key) {
-        if (StringUtils.containsAny(key, "=<>!")) {
-            return isLogicalOperationTrue(key);
-        }
-        else {
-            return isLogicalTrueSimple(key);
-        }
-    }
-
-    public boolean isLogicalOperationTrue(String expression) {
-        LogicalOperation logicExpression = new LogicalOperation(expression);
-        if (logicExpression.isValid()) {
-            Object value = this.parseValueLocalOrGlobal(logicExpression.getKey());
-            return logicExpression.evaluate(value);
-        }
-        return false;
-    }
-
-    public boolean isLogicalTrueSimple(String key) {
-        Object value = this.parseValueLocalOrGlobal(key);
-        if (value == null) {
-            return false;
-        }
-        else if (value instanceof String) {
-            if ("yes".equalsIgnoreCase((String) value)
-                    || "y".equalsIgnoreCase((String) value)) {
-                return true;
-            }
-            else if ("no".equalsIgnoreCase((String) value)
-                    || "n".equalsIgnoreCase((String) value)) {
-                return false;
-            }
-            else {
-                return StringUtils.isNotBlank((CharSequence) value);
-            }
-        }
-        else if (value instanceof Number) {
-            return ((Number) value).longValue() > 0;
-        }
-        else if (value instanceof Boolean) {
-            return (Boolean) value;
-        }
-        else if (value instanceof Date) {
-            return ((Date) value).getTime() > 0;
-        }
-        else if (value instanceof Calendar) {
-            return ((Calendar) value).getTimeInMillis() > 0;
-        }
-        else if (value instanceof JsonPrimitive) {
-            if (((JsonPrimitive) value).isBoolean()) {
-                return ((JsonPrimitive) value).getAsBoolean();
-            }
-            else if (((JsonPrimitive) value).isNumber()) {
-                return ((JsonPrimitive) value).getAsNumber().doubleValue() > 0;
-            }
-            else if (((JsonPrimitive) value).isString()) {
-                return ((JsonPrimitive) value).getAsString().length() > 0;
-            }
-        }
-        else if (value instanceof Collection) {
-            return ((Collection) value).size() > 0;
-        }
-        else if (value instanceof JsonArray) {
-            return ((JsonArray) value).size() > 0;
-        }
-        else if (value instanceof Map) {
-            return ((Map) value).size() > 0;
-        }
-        else if (value instanceof JsonObject) {
-            return ((JsonObject) value).size() > 0;
-        }
-        else if (value.getClass().isArray()) {
-            return ((Object[]) value).length > 0;
-        }
-        return false;
     }
 
     @Override

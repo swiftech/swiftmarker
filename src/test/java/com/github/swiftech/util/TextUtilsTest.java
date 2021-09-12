@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @author Allen 2019-03-31
+ * @author swiftech 2019-03-31
  **/
 public class TextUtilsTest {
 

@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * @author Allen 2018-12-16
+ * @author swiftech 2018-12-16
  **/
 public class BaseResourceTest {
 

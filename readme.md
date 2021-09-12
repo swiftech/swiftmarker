@@ -193,9 +193,10 @@ $[collection]
 $[]
 ```
 
-* Logical expression also supports simple operation, like:
+* Logical expression also supports simple or compound operation, eg:
   * `str = 'foo'` `str != 'foo'`
-  * `int = 9` `int > 9` `int < 9` `int >= 9` `int <= 9`
+  * `num = 9` `num > 9` `num < 9` `num >= 9` `num <= 9`
+  * `num > 9 & num < 99` `str = 'foo' | str = 'bar'` `num > 9 | str = 'foo' | logic_exp`
 
 
 ##### Other supported data model object types
