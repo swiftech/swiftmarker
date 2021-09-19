@@ -3,4 +3,7 @@ What's your favorite color?
 	B: Green
 	C: Blue
 
+{index=A, option=Red}
+{index=B, option=Green}
+{index=C, option=Blue}
 the end

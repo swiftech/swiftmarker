@@ -45,7 +45,7 @@ public interface DataModelHandler {
      * @param loopKey 行数组的 key
      * @return 行数组的 key 的取值
      */
-    LoopMatrix onLoop(String loopKey);
+    LoopModel onLoop(String loopKey);
 
     /**
      * 获取栈顶的数据模型

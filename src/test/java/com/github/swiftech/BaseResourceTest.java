@@ -100,11 +100,15 @@ public class BaseResourceTest {
     protected String loadJsonData(String name) {
         InputStream resourceAsStream =
                 this.getClass().getResourceAsStream("/data/" + name + ".json");
+        if (resourceAsStream == null) {
+            throw new RuntimeException(String.format("No assert data found: %s.json", name));
+        }
         String s = null;
         try {
             s = IOUtils.toString(resourceAsStream, "UTF-8");
         } catch (IOException e) {
             e.printStackTrace();
+            throw new RuntimeException(e);
         }
         return s;
     }
@@ -115,6 +119,7 @@ public class BaseResourceTest {
                 this.getClass().getResourceAsStream(uri);
         if (resourceAsStream == null) {
             log.error("Assert resource not exist:" + uri);
+            throw new RuntimeException("Assert resource not exist:" + uri);
         }
         String s = null;
         try {

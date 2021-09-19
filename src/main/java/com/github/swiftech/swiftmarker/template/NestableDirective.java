@@ -7,6 +7,7 @@ public abstract class NestableDirective extends Directive {
 
     /**
      * This is used for later processing.
+     * Anything in unavailable nested directive will be ignored.
      */
     protected boolean isAvailable = false;
 

@@ -20,7 +20,6 @@ import com.github.swiftech.swiftmarker.template.*;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * 模板引擎
@@ -148,6 +147,7 @@ public class TemplateEngine {
                 // 从当前模型中获取集合，将集合元素倒序压入堆栈
                 if (directiveStack.isTopAvailable()) {
                     LoopBegin loopBegin = (LoopBegin) directive;
+                    // 去除循环开始指令的独占的一行
                     if (loopBegin.isWrappedWithLineBreak()) {
                         debugDirective("trim last line break", i, level);
                         boolean needTrimMore = !renderContext.trimTailLineBreak();
@@ -156,15 +156,15 @@ public class TemplateEngine {
                             renderContext.setNeedMoreTrim(true); // 处理模版是以嵌套指令开始的情况
                         }
                     }
-                    LoopMatrix loopMatrix = dataModelHandler.onLoop(loopBegin.getValue());
-                    List<Map<String, Object>> matrix = loopMatrix.getMatrix();
+                    LoopModel loopMatrix = dataModelHandler.onLoop(loopBegin.getValue());
+                    List<Object> matrix = loopMatrix.getMatrix();
                     if (matrix == null || matrix.isEmpty()) {
                         loopBegin.setAvailable(false);
                         directiveStack.push(loopBegin);
                     }
                     else {
                         for (int j = matrix.size() - 1; j >= 0; j--) {
-                            Map<String, Object> subModel = matrix.get(j);
+                            Object subModel = matrix.get(j);
                             dataModelHandler.pushDataModel(subModel);
                         }
                         loopBegin.setAvailable(true);

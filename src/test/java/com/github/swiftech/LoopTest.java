@@ -47,6 +47,15 @@ public class LoopTest extends BaseResourceTest {
     }
 
     /**
+     * 测试重复的基本的循环
+     */
+    @Test
+    public void testBasicRepeatLoop() {
+        String rendered = super.runFromResourceAndAssert("loop/basic_repeat", "loop/basic");
+        log.data(rendered);
+    }
+
+    /**
      * 测试基本的循环（纯嵌套语句）
      */
     @Test
