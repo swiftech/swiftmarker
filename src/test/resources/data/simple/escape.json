@@ -1,5 +1,8 @@
 {
   "foo": {
     "bar": "you can't see me"
-  }
+  },
+  "foobar": [
+    "foo", "bar"
+  ]
 }

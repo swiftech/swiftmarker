@@ -3,3 +3,7 @@ ${foo.bar}
 $[options]
 ?{condition}
 ======
+\you can't see me
+\foobar
+\see me
+======

@@ -4,6 +4,7 @@ import com.github.swiftech.swiftmarker.parser.CompoundLogicalOperation;
 import com.github.swiftech.swiftmarker.parser.LogicalValue;
 import com.github.swiftech.swiftmarker.util.ObjectUtils;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.lang3.StringUtils;
 
@@ -66,8 +67,8 @@ public class StackDataModelHandler implements DataModelHandler {
 
     @Override
     public boolean isInEmptyLoop() {
-        return getTopDataModel() instanceof LoopMatrix
-                && ((LoopMatrix) getTopDataModel()).getMatrix().isEmpty();
+        return getTopDataModel() instanceof LoopModel
+                && ((LoopModel) getTopDataModel()).getMatrix().isEmpty();
     }
 
     public String onKey(String key) {
@@ -103,8 +104,12 @@ public class StackDataModelHandler implements DataModelHandler {
      */
     private Object parseValueLocalOrGlobal(String key) {
         Object v;
-        Object model;
-        if (key.startsWith(".")) {
+        Object model = null;
+        if (".".equals(key)) {
+            model = getTopDataModel();
+            v = model;
+        }
+        else if (key.startsWith(".")) {
             model = getTopDataModel();
             v = dataModelHelper.getValueRecursively(
                     model,
@@ -122,22 +127,22 @@ public class StackDataModelHandler implements DataModelHandler {
     }
 
     @Override
-    public LoopMatrix onLoop(String loopKey) {
-        List<Map<String, Object>> ret = new ArrayList<>();
+    public LoopModel onLoop(String loopKey) {
+        List<Object> ret = new ArrayList<>();
 
         // 只能用 Iterable， 因为可能返回各种对象
         Iterable dataMatrix = dataModelHelper.getValueRecursively(getTopDataModel(), loopKey, Iterable.class);
         if (dataMatrix == null || !dataMatrix.iterator().hasNext()) {
             Logger.getInstance().warn(String.format("No collection or key-value object in the data model %s by key: %s", getTopDataModel().getClass(), loopKey));
             processContext.addMessageToCurrentGroup(String.format("No collection or key-value object in the data model %s by key: %s", getTopDataModel().getClass(), loopKey));
-            return new LoopMatrix(ret);
+            return new LoopModel(ret);
         }
 
-        // 遍历数据模型中的数组（含多值）
+        // 遍历数据模型中的数组（含单值或多值）
         for (Object dataRow : dataMatrix) {
-            Map<String, Object> m = new HashMap<>();
             // 数组成员是 JsonObject，
             if (dataRow instanceof JsonObject) {
+                Map<String, Object> m = new HashMap<>();
                 for (String k : ((JsonObject) dataRow).keySet()) {
                     // 从数组成员中获值
                     Object v = dataModelHelper.getValueRecursively(dataRow, k, Object.class);
@@ -145,36 +150,51 @@ public class StackDataModelHandler implements DataModelHandler {
                         m.put(k, v);
                     }
                 }
+                ret.add(m);
             }
             else if (dataRow instanceof Map) {
-                for (Object k : ((Map) dataRow).keySet()) {
-                    Object v = dataModelHelper.getValueRecursively(dataRow, (String) k, Object.class);
-                    m.put(k.toString(), v);
-                }
+//                for (Object k : ((Map) dataRow).keySet()) {
+//                    Object v = dataModelHelper.getValueRecursively(dataRow, (String) k, Object.class);
+//                    m.put(k.toString(), v);
+//                }
+                ret.add(dataRow);
             }
             else if (ObjectUtils.isIterableList(dataRow)) {
+                Map<String, Object> m = new HashMap<>();
                 int i = 0;
                 for (Object v : ((Iterable) dataRow)) {
                     m.put(String.valueOf(i++), v);
                 }
+                ret.add(m);
             }
             else if (dataRow.getClass().isArray()) {
+                Map<String, Object> m = new HashMap<>();
                 Object[] arow = (Object[]) dataRow;
                 for (int i = 0; i < arow.length; i++) {
                     m.put(String.valueOf(i), arow[i]);
                 }
+                ret.add(m);
             }
             else if (!ObjectUtils.isPrimitive(dataRow)) {
+                Map<String, Object> m = new HashMap<>();
                 // Bean对象处理
                 Collection<String> allFieldsName = dataModelHelper.getAllFieldsName(dataRow.getClass());
                 for (String k : allFieldsName) {
                     Object v = dataModelHelper.getValueRecursively(dataRow, k, Object.class);
                     m.put(k, v);
                 }
+                ret.add(m);
             }
-            ret.add(m);
+            else if (dataRow instanceof JsonPrimitive) {
+                // JsonPrimitive 需要特殊处理
+                ret.add(((JsonPrimitive) dataRow).getAsString());
+            }
+            else {
+                // 其他所有 primitive 的对象，例如 String, Integer 等
+                ret.add(dataRow);
+            }
         }
-        return new LoopMatrix(ret);
+        return new LoopModel(ret);
     }
 
     public Object getTopDataModel() {

@@ -39,51 +39,51 @@ public class TemplateParser {
         StateBuilder<String, Character> builder = new StateBuilder<>();
         builder.state(S_PENDING_LOGIC)
                 .in(payload -> {
-                    log.trace("in pending logic: " + payload);
+                    if (log.isTraceEnabled()) log.trace("in pending logic: " + payload);
                     appendToStanza(payload); // may be not directive, so add to stanza first, if it isn't, this char will not be flushed.
                 })
                 .state(S_PENDING_OTHER)
                 .in(payload -> {
-                    log.trace("in pending other: " + payload);
+                    if (log.isTraceEnabled()) log.trace("in pending other: " + payload);
                     appendToStanza(payload); // may be not directive, so add to stanza first, if it isn't, this char will not be flushed.
                 })
                 .state(S_IN_LOGIC)
                 .in(payload -> {
-                    log.trace("in logic: " + payload);
+                    if (log.isTraceEnabled()) log.trace("in logic: " + payload);
                     pushStanzaWithoutLatest();
                 })
                 .state(S_IN_LOOP)
                 .in(payload -> {
-                    log.trace("in loop: " + payload);
+                    if (log.isTraceEnabled()) log.trace("in loop: " + payload);
                     pushStanzaWithoutLatest();
                 })
                 .state(S_IN_VAR)
                 .in(payload -> {
-                    log.trace("in var: " + payload);
+                    if (log.isTraceEnabled()) log.trace("in var: " + payload);
                     pushStanzaWithoutLatest();
                 })
                 .state(S_IN_EXP_LOGIC)
                 .in(payload -> {
-                    log.trace("in exp logic: " + payload);
+                    if (log.isTraceEnabled()) log.trace("in exp logic: " + payload);
                     appendToExpression(payload);
                 })
                 .state(S_IN_EXP_LOOP)
                 .in(payload -> {
-                    log.trace("in exp loop: " + payload);
+                    if (log.isTraceEnabled()) log.trace("in exp loop: " + payload);
                     appendToExpression(payload);
                 })
                 .state(S_IN_EXP_VAR)
                 .in(payload -> {
-                    log.trace("in exp var: " + payload);
+                    if (log.isTraceEnabled()) log.trace("in exp var: " + payload);
                     appendToExpression(payload);
                 })
                 .state(S_ESCAPING)
                 .in(payload -> {
-                    log.trace("escaping: " + payload);
+                    if (log.isTraceEnabled()) log.trace("escaping: " + payload);
                 })
                 .state(S_IN_STANZA)
                 .in(payload -> {
-                    log.trace("in stanza: " + payload);
+                    if (log.isTraceEnabled()) log.trace("in stanza: " + payload);
                 })
                 .initialize("ready", S_READY)
                 .action("?", S_READY, S_PENDING_LOGIC)
@@ -123,7 +123,7 @@ public class TemplateParser {
     public List<Directive> parse(String id, String template) {
         this.sm.start(id);
         template.chars().forEach(c -> {
-            log.trace(String.valueOf((char) c));
+            if (log.isTraceEnabled()) log.trace(String.valueOf((char) c));
             if (c == '$') {
                 this.sm.post(id, S_PENDING_OTHER, (char) c);
             }
@@ -131,7 +131,13 @@ public class TemplateParser {
                 this.sm.post(id, S_PENDING_LOGIC, (char) c);
             }
             else if (c == '\\') {
-                this.sm.post(id, S_ESCAPING, (char) c);
+                if (sm.isStateIn(id, S_PENDING_LOGIC, S_PENDING_OTHER)) {
+                    this.sm.post(id, S_ESCAPING, (char) c);
+                }
+                else {
+                    appendToStanza((char) c);
+                    sm.post(id, S_IN_STANZA, (char) c);
+                }
             }
             else if (c == '[') {
                 if (sm.isState(id, S_PENDING_OTHER)) {

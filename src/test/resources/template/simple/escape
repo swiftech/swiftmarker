@@ -3,3 +3,7 @@ $\{foo.bar}
 $\[options]
 ?\{condition}
 ======
+\${foo.bar}
+\$[foobar]${.}$[]
+\?{foo}see me?{}
+======

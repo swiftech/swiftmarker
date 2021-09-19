@@ -24,6 +24,14 @@ public class LogicTest extends BaseResourceTest {
         String s = super.runFromResourceAndAssert("logic/basic");
         log.data(s);
     }
+    /**
+     * 测试各种逻辑true
+     */
+    @Test
+    public void testLogicEmpty() {
+        String s = super.runFromResourceAndAssert("logic/empty", "logic/basic");
+        log.data(s);
+    }
 
     /**
      * 测试各种逻辑false
