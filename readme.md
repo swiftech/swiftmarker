@@ -57,18 +57,22 @@ hate leads to suffering.
 
 ###### Loop Expression
 
-Use ```$[var]...$[]``` pair to select elements in data model and loop them. If no any elements selected, anything between them will not be rendered.
+Use ```$[var]...$[]``` pair to select listable object(includes array/JsonArray/List) in data model and loop them. 
+If no any elements selected, anything between them will NOT be rendered.
 
-* loop expression with key-value elements
+If the elements are key-value object, use ```${}``` expression starts with `.` to select param value.
 
-Use ```$[]``` to select array/JsonArray/List in data model and use ```${}``` to select params in key-value element. To select params in the loop the expression must starts with `.`, expression in the loop starts without `.` will select params from the global data model.
+> expression starts without `.` will select params from the global data model.
+
+If the elements are primitive object (like String, Integer etc.), just use ```${.}```` to output this element directly.
 
 * Template
 ```
 ${question.title}
 $[question.options]${.index}: ${.option}$[]
 
-My choice is: ${question.options.1.index}
+My choice is: $[answers]${.}$[]
+Her choice is: ${question.options.1.index}
 ```
 
 > Notice: loop expression must ends with ```$[]```.
@@ -77,24 +81,28 @@ My choice is: ${question.options.1.index}
 ```json
 {
 	"question": {
-		"title": "What's your favorite color?",
+		"title": "What's your favorite colors?",
 		"options": [
 			{"index": "A", "option": "Red"},
 			{"index": "B", "option": "Green"},
 			{"index": "C", "option": "Blue"}
-		]			
-	}
+		]
+	},
+    "answers": [
+      "A", "C"
+    ]
 }
 ```
 
 * Result
 ```
-What's your favorite color?
+What's your favorite colors?
 A: Red
 B: Green
 C: Blue
 
-My choice is: B
+My choice is: AC
+Her choice is: B
 ```
 
 > Notice: The line only contains the ```$[]``` placeholder will not output a new line.
@@ -193,7 +201,7 @@ $[collection]
 $[]
 ```
 
-* Logical expression also supports simple or compound operation, eg:
+* Logical expression also supports single or compound operation, eg:
   * `str = 'foo'` `str != 'foo'`
   * `num = 9` `num > 9` `num < 9` `num >= 9` `num <= 9`
   * `num > 9 & num < 99` `str = 'foo' | str = 'bar'` `num > 9 | str = 'foo' | logic_exp`
@@ -279,5 +287,6 @@ renderExpressionIfValueIsBlank| set false to avoid render expression if no value
 ### Release Update
 see [changelog](changelog.md)
 
-### Limitation
-* Comments in the template is not supported yet.
+
+### Coming Soon
+* Supports comment in the template.
