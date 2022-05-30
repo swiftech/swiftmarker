@@ -1,3 +1,6 @@
+* v3.2
+  * upgrade dependencies.
+
 * 2021-09-20 v3.1
     * add simple logical operation in the expression.
     * add primitive element support for loop expression.

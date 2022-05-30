@@ -125,96 +125,96 @@ public class TemplateParser {
         template.chars().forEach(c -> {
             if (log.isTraceEnabled()) log.trace(String.valueOf((char) c));
             if (c == '$') {
-                this.sm.post(id, S_PENDING_OTHER, (char) c);
+                this.sm.postWithPayload(id, S_PENDING_OTHER, (char) c);
             }
             else if (c == '?') {
-                this.sm.post(id, S_PENDING_LOGIC, (char) c);
+                this.sm.postWithPayload(id, S_PENDING_LOGIC, (char) c);
             }
             else if (c == '\\') {
                 if (sm.isStateIn(id, S_PENDING_LOGIC, S_PENDING_OTHER)) {
-                    this.sm.post(id, S_ESCAPING, (char) c);
+                    this.sm.postWithPayload(id, S_ESCAPING, (char) c);
                 }
                 else {
                     appendToStanza((char) c);
-                    sm.post(id, S_IN_STANZA, (char) c);
+                    sm.postWithPayload(id, S_IN_STANZA, (char) c);
                 }
             }
             else if (c == '[') {
                 if (sm.isState(id, S_PENDING_OTHER)) {
-                    sm.post(id, S_IN_LOOP, (char) c);
+                    sm.postWithPayload(id, S_IN_LOOP, (char) c);
                 }
                 else {
                     appendToStanza((char) c);
-                    sm.post(id, S_IN_STANZA, (char) c);
+                    sm.postWithPayload(id, S_IN_STANZA, (char) c);
                 }
             }
             else if (c == '{') {
                 if (sm.isState(id, S_PENDING_OTHER)) {
-                    sm.post(id, S_IN_VAR, (char) c);
+                    sm.postWithPayload(id, S_IN_VAR, (char) c);
                 }
                 else if (sm.isState(id, S_PENDING_LOGIC)) {
-                    sm.post(id, S_IN_LOGIC, (char) c);
+                    sm.postWithPayload(id, S_IN_LOGIC, (char) c);
                 }
                 else {
                     appendToStanza((char) c);
-                    sm.post(id, S_IN_STANZA, (char) c);
+                    sm.postWithPayload(id, S_IN_STANZA, (char) c);
                 }
             }
             else if (c == '}') {
                 if (sm.isStateIn(id, S_IN_LOGIC, S_IN_VAR)) {
                     pushExpression(id);
-                    sm.post(id, S_IN_STANZA, (char) c);
+                    sm.postWithPayload(id, S_IN_STANZA, (char) c);
                 }
                 else if (sm.isStateIn(id, S_IN_EXP_LOGIC)) {
                     pushExpression(id);
-                    sm.post(id, S_IN_STANZA, (char) c);
+                    sm.postWithPayload(id, S_IN_STANZA, (char) c);
                 }
                 else if (sm.isStateIn(id, S_IN_EXP_VAR)) {
                     pushExpression(id);
-                    sm.post(id, S_IN_STANZA, (char) c);
+                    sm.postWithPayload(id, S_IN_STANZA, (char) c);
                 }
                 else {
                     appendToStanza((char) c);
-                    sm.post(id, S_IN_STANZA, (char) c);
+                    sm.postWithPayload(id, S_IN_STANZA, (char) c);
                 }
             }
             else if (c == ']') {
                 if (sm.isStateIn(id, S_IN_LOOP)) {
                     pushExpression(id);
-                    sm.post(id, S_IN_STANZA, (char) c);
+                    sm.postWithPayload(id, S_IN_STANZA, (char) c);
                 }
                 else if (sm.isState(id, S_IN_EXP_LOOP)) {
                     pushExpression(id);
-                    sm.post(id, S_IN_STANZA, (char) c);
+                    sm.postWithPayload(id, S_IN_STANZA, (char) c);
                 }
                 else {
                     appendToStanza((char) c);
-                    sm.post(id, S_IN_STANZA, (char) c);
+                    sm.postWithPayload(id, S_IN_STANZA, (char) c);
                 }
             }
             else {
                 if (sm.isStateIn(id, S_IN_LOGIC)) {
-                    sm.post(id, S_IN_EXP_LOGIC, (char) c);
+                    sm.postWithPayload(id, S_IN_EXP_LOGIC, (char) c);
                 }
                 else if (sm.isState(id, S_IN_LOOP)) {
-                    sm.post(id, S_IN_EXP_LOOP, (char) c);
+                    sm.postWithPayload(id, S_IN_EXP_LOOP, (char) c);
                 }
                 else if (sm.isState(id, S_IN_VAR)) {
-                    sm.post(id, S_IN_EXP_VAR, (char) c);
+                    sm.postWithPayload(id, S_IN_EXP_VAR, (char) c);
                 }
                 else if (sm.isStateIn(id, S_PENDING_LOGIC, S_PENDING_OTHER, S_ESCAPING)) {
                     appendToStanza((char) c);
-                    sm.post(id, S_IN_STANZA, (char) c);
+                    sm.postWithPayload(id, S_IN_STANZA, (char) c);
                 }
                 else {
                     if (sm.isStateIn(id, S_IN_EXP_LOGIC, S_IN_EXP_LOOP, S_IN_EXP_VAR)) {
                         // still in expression
-                        sm.post(id, sm.getCurrentState(id), (char) c);
+                        sm.postWithPayload(id, sm.getCurrentState(id), (char) c);
                     }
                     else {
                         // still in stanza
                         appendToStanza((char) c);
-                        sm.post(id, S_IN_STANZA, (char) c);
+                        sm.postWithPayload(id, S_IN_STANZA, (char) c);
                     }
                 }
             }
