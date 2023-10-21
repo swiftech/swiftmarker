@@ -10,7 +10,7 @@ import static org.apache.commons.lang3.StringUtils.*;
  */
 public class GroupPattern {
 
-    private String pattern;
+    private final String pattern;
 
     private String parentPattern;
 

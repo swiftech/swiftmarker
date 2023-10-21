@@ -19,7 +19,7 @@ public class PracticeTest extends BaseResourceTest {
         String temp = "/template/backend/{locale}/src/main/java/model/entity/Base${project_name}Entity.java.tpl";
         super.engine.setTemplate(temp);
         Object model = new Object(){
-            String project_name = "FooBar";
+            final String project_name = "FooBar";
         };
         String result = super.engine.process(model, new ProcessContext());
         System.out.println(result);

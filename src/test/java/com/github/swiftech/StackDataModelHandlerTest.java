@@ -13,10 +13,10 @@ public class StackDataModelHandlerTest {
     @Test
     public void testBoolean() {
         StackDataModelHandler handler = new StackDataModelHandler(new Object() {
-            Object l1 = new Object() {
-                Object l2 = new Object() {
-                    boolean boolTrue = true;
-                    Boolean boolFalse = false;
+            final Object l1 = new Object() {
+                final Object l2 = new Object() {
+                    final boolean boolTrue = true;
+                    final Boolean boolFalse = false;
                 };
             };
         }, new ProcessContext());
@@ -27,10 +27,10 @@ public class StackDataModelHandlerTest {
     @Test
     public void testExpression() {
         StackDataModelHandler handler = new StackDataModelHandler(new Object() {
-            Object l1 = new Object() {
-                Object l2 = new Object() {
-                    String a = "A";
-                    int b = 9;
+            final Object l1 = new Object() {
+                final Object l2 = new Object() {
+                    final String a = "A";
+                    final int b = 9;
                 };
             };
         }, new ProcessContext());

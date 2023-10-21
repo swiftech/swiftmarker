@@ -15,7 +15,7 @@ import static com.github.swiftech.swiftmarker.constant.Constants.*;
  */
 public class TemplateParser {
 
-    private final Logger log = Logger.getInstance();
+    private static final Logger log = Logger.getInstance();
 
     private final StateMachine<String, Character> sm;
 

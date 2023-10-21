@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Assertions;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
 /**
  * @author swiftech 2018-12-16
@@ -90,7 +91,7 @@ public class BaseResourceTest {
                 this.getClass().getResourceAsStream("/template/" + name);
         String s = null;
         try {
-            s = IOUtils.toString(resourceAsStream, "UTF-8");
+            s = IOUtils.toString(resourceAsStream, StandardCharsets.UTF_8);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -105,7 +106,7 @@ public class BaseResourceTest {
         }
         String s = null;
         try {
-            s = IOUtils.toString(resourceAsStream, "UTF-8");
+            s = IOUtils.toString(resourceAsStream, StandardCharsets.UTF_8);
         } catch (IOException e) {
             e.printStackTrace();
             throw new RuntimeException(e);
@@ -123,7 +124,7 @@ public class BaseResourceTest {
         }
         String s = null;
         try {
-            s = IOUtils.toString(resourceAsStream, "UTF-8");
+            s = IOUtils.toString(resourceAsStream, StandardCharsets.UTF_8);
         } catch (IOException e) {
             e.printStackTrace();
         }

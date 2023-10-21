@@ -37,7 +37,7 @@ import java.util.List;
  */
 public class TemplateEngine {
 
-    private final Logger log = Logger.getInstance();
+    private static final Logger log = Logger.getInstance();
 
     private String template;
 
