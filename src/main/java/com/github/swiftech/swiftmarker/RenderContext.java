@@ -74,7 +74,7 @@ public class RenderContext {
      */
     public boolean trimTailLineBreak() {
         StringBuilder buf = getBuffer();
-        if (buf == null || buf.length() == 0) {
+        if (buf == null || buf.isEmpty()) {
             return false;
         }
         if (buf.charAt(buf.length() - 1) == '\n') {
@@ -86,7 +86,7 @@ public class RenderContext {
 
     public boolean trimHeadLineBreak() {
         StringBuilder buf = getBuffer();
-        if (buf == null || buf.length() == 0) {
+        if (buf == null || buf.isEmpty()) {
             return false;
         }
         if (buf.charAt(0) == '\n') {
@@ -116,7 +116,7 @@ public class RenderContext {
      */
     private StringBuilder deleteInBuffer(int startInclusive, int endExclusive) {
         StringBuilder buf = renderBufStack.peek();
-        if (buf == null || buf.length() == 0) {
+        if (buf == null || buf.isEmpty()) {
             throw new IllegalStateException("Render buffer is empty");
         }
         buf.delete(startInclusive, endExclusive);
