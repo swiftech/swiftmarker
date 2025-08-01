@@ -14,7 +14,7 @@ SwiftMarker是一个轻量级的模板引擎
 * 逻辑表达式
 
 ### 依赖
-* JDK 8
+* JDK 17
 
 ### Maven
 
@@ -22,6 +22,6 @@ SwiftMarker是一个轻量级的模板引擎
 <dependency>
 	<groupId>com.github.swiftech</groupId>
 	<artifactId>swiftmarker</artifactId>
-	<version>3.0</version>
+	<version>3.2</version>
 </dependency>
 ```

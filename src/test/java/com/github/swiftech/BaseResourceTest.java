@@ -87,9 +87,9 @@ public class BaseResourceTest {
     }
 
     protected String loadTemplate(String name) {
+        String s = null;
         InputStream resourceAsStream =
                 this.getClass().getResourceAsStream("/template/" + name);
-        String s = null;
         try {
             s = IOUtils.toString(resourceAsStream, StandardCharsets.UTF_8);
         } catch (IOException e) {
@@ -100,7 +100,7 @@ public class BaseResourceTest {
 
     protected String loadJsonData(String name) {
         InputStream resourceAsStream =
-                this.getClass().getResourceAsStream("/data/" + name + ".json");
+                this.getClass().getResourceAsStream("/data/%s.json".formatted(name));
         if (resourceAsStream == null) {
             throw new RuntimeException(String.format("No assert data found: %s.json", name));
         }

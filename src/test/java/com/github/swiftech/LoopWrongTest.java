@@ -13,22 +13,24 @@ public class LoopWrongTest extends BaseResourceTest {
 
     @Test
     public void testWrongLoop() {
-        engine.setTemplate("${question.title}\n" +
-                "$[question.options]${index}: ${option}$[]" +
-                "\n" +
-                "the end");
+        engine.setTemplate("""
+                ${question.title}
+                $[question.options]${index}: ${option}$[]
+                
+                the end""");
 
-        String json = "{\n" +
-                "  \"question\": {\n" +
-                "      \"title\": [\"What's your favorite color?\"],\n" +
-                "      \"options\": \"haha\",\n" +
-                "      \"opts\": [\n" +
-                "          {\"index\": \"A\", \"option\": \"Red\"},\n" +
-                "          {\"index\": \"B\", \"option\": \"Green\"},\n" +
-                "          {\"index\": \"C\", \"option\": \"Blue\"}\n" +
-                "      ]\n" +
-                "  }\n" +
-                "}";
+        String json = """
+                {
+                  "question": {
+                      "title": ["What's your favorite color?"],
+                      "options": "haha",
+                      "opts": [
+                          {"index": "A", "option": "Red"},
+                          {"index": "B", "option": "Green"},
+                          {"index": "C", "option": "Blue"}
+                      ]
+                  }
+                }""";
         System.out.println(json);
         JsonObject jsonObject = new Gson().fromJson(json, JsonObject.class);
         Assertions.assertThrows(Exception.class, () -> {
@@ -39,8 +41,9 @@ public class LoopWrongTest extends BaseResourceTest {
 
     @Test
     public void testWrongArray() {
-        engine.setTemplate("What's your favorite color?\n" +
-                "$[question.options]${index}: ${option}$[]");
+        engine.setTemplate("""
+                What's your favorite color?
+                $[question.options]${index}: ${option}$[]""");
 
         String json = loadJsonData("loop/basic_less");
         JsonObject jsonObject = new Gson().fromJson(json, JsonObject.class);

@@ -40,12 +40,12 @@ public class TemplateParser {
         builder.state(S_PENDING_LOGIC)
                 .in(payload -> {
                     if (log.isTraceEnabled()) log.trace("in pending logic: " + payload);
-                    appendToStanza(payload); // may be not directive, so add to stanza first, if it isn't, this char will not be flushed.
+                    appendToStanza(payload); // maybe not directive, so add to stanza first, if it isn't, this char will not be flushed.
                 })
                 .state(S_PENDING_OTHER)
                 .in(payload -> {
                     if (log.isTraceEnabled()) log.trace("in pending other: " + payload);
-                    appendToStanza(payload); // may be not directive, so add to stanza first, if it isn't, this char will not be flushed.
+                    appendToStanza(payload); // maybe not directive, so add to stanza first, if it isn't, this char will not be flushed.
                 })
                 .state(S_IN_LOGIC)
                 .in(payload -> {
@@ -298,7 +298,7 @@ public class TemplateParser {
                 directiveStack.pop();
             }
         }
-        // Collect directive and link with previous one.
+        // Collect directive and link with the previous one.
         if (directive != null) {
             if (!parseResult.isEmpty()) {
                 Directive preDirective = parseResult.get(parseResult.size() - 1);

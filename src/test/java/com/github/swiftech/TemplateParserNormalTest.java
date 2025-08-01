@@ -53,19 +53,26 @@ public class TemplateParserNormalTest {
 
     @Test
     public void testLoopLogicNestMultiLines() {
-        parser.parse(String.valueOf(Thread.currentThread().getId()), "$[loop]\n?{logic}\n${var}\nxxx\n?{}\n$[]");
+        parser.parse(String.valueOf(Thread.currentThread().getId()), """
+                $[loop]
+                ?{logic}
+                ${var}
+                xxx
+                ?{}
+                $[]""");
     }
 
     @Test
     public void testLoopsMultiLines() {
-        parser.parse(String.valueOf(Thread.currentThread().getId()), "$[loop1]\n" +
-                "${var}\n" +
-                "xxx\n" +
-                "$[]\n" +
-                "\n" +
-                "$[loop2]\n" +
-                "yyy\n" +
-                "$[]");
+        parser.parse(String.valueOf(Thread.currentThread().getId()), """
+                $[loop1]
+                ${var}
+                xxx
+                $[]
+                
+                $[loop2]
+                yyy
+                $[]""");
     }
 
     @Test

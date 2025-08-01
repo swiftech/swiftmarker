@@ -173,7 +173,7 @@ public class ProcessContext {
                         || ((MessageGroup) message).isMandatory()) {
                     visitor.consume(message);
                 }
-                this.visit((MessageGroup) message, visitor); // recursive to next level
+                this.visit((MessageGroup) message, visitor); // recursive to the next level
             }
             else {
                 throw new RuntimeException("Not supported message type");

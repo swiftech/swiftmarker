@@ -10,7 +10,7 @@ SwiftMarker是一个轻量级的模板引擎
 * Simple and easy to use but flexible. 
 * Supports loop expression, logical expression and nested expression.
 * You can simply use dotted name like ```foo.bar``` to select params in data model.
-* Multiple types are supported to composite data model: array, ```List```, ```JsonArray```, ```Map```, ```JsonObject``` and even plain Bean object. you can combine them freely.
+* Multiple types are supported to a composite data model: array, ```List```, ```JsonArray```, ```Map```, ```JsonObject``` and even plain Bean object. you can combine them freely.
 
 ### Dependencies
 * JDK 8+
@@ -29,7 +29,7 @@ String result = swiftMarker.render(model);
 
 ##### Basic Usage
 
-Use ```${}``` to select params from data model.
+Use ```${}``` to select params from a data model.
 
 * Template
 ```
@@ -57,14 +57,14 @@ hate leads to suffering.
 
 ###### Loop Expression
 
-Use ```$[var]...$[]``` pair to select listable object(includes array/JsonArray/List) in data model and loop them. 
-If no any elements selected, anything between them will NOT be rendered.
+Use ```$[var]...$[]``` pair to select listable object(includes array/JsonArray/List) in a data model and loop them. 
+If no any elements are selected, anything between them will NOT be rendered.
 
 If the elements are key-value object, use ```${}``` expression starts with `.` to select param value.
 
 > expression starts without `.` will select params from the global data model.
 
-If the elements are primitive object (like String, Integer etc.), just use ```${.}```` to output this element directly.
+If the elements are primitive object (like String, Integer, etc.), just use ```${.}```` to output this element directly.
 
 * Template
 ```

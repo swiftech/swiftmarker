@@ -14,7 +14,7 @@ public class TextUtilsTest {
 
     @Test
     public void testJoin() {
-        List l = new ArrayList() {
+        List<String> l = new ArrayList<>() {
             {
                 add("aaa");
                 add("bbb");

@@ -134,7 +134,7 @@ public class LoopTest extends BaseResourceTest {
         Object o = new Object() {
             final Object question = new Object() {
                 final String title = "What's your favorite color?";
-                final Object options = new ArrayList<Object>() {
+                final Object options = new ArrayList<>() {
                     {
                         add(new HashMap<String, String>() {
                             {
@@ -158,9 +158,10 @@ public class LoopTest extends BaseResourceTest {
      */
     @Test
     public void testLoopArray() {
-        engine.setTemplate("${question.title}\n" +
-                "$[question.options]${0} : ${1}$[]\n" +
-                "the end");
+        engine.setTemplate("""
+                ${question.title}
+                $[question.options]${0} : ${1}$[]
+                the end""");
 
         final JsonArray jac = new JsonArray();
         jac.add("C");

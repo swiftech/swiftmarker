@@ -1,5 +1,7 @@
 package com.github.swiftech.swiftmarker.model;
 
+import org.apache.commons.lang3.Strings;
+
 import static org.apache.commons.lang3.StringUtils.*;
 
 /**
@@ -24,10 +26,10 @@ public class GroupPattern {
 
     public String getParentPattern() {
         if (isBlank(parentPattern)) {
-            String replaced = replace(pattern, "\\.", String.valueOf(SUBSTITUTE));
+            String replaced = Strings.CS.replace(pattern, "\\.", String.valueOf(SUBSTITUTE));
             if (replaced.contains(".")) {
                 parentPattern = substringBeforeLast(replaced, ".");
-                parentPattern = replace(parentPattern, String.valueOf(SUBSTITUTE), ".");
+                parentPattern = Strings.CS.replace(parentPattern, String.valueOf(SUBSTITUTE), ".");
             }
             else {
                 parentPattern = EMPTY;
@@ -38,10 +40,10 @@ public class GroupPattern {
 
     public String getGroupName() {
         if (isBlank(groupName)) {
-            String replaced = replace(pattern, "\\.", String.valueOf(SUBSTITUTE));
+            String replaced = Strings.CS.replace(pattern, "\\.", String.valueOf(SUBSTITUTE));
             if (replaced.contains(".")) {
                 groupName = substringAfterLast(replaced, ".");
-                groupName = replace(groupName, String.valueOf(SUBSTITUTE), ".");
+                groupName = Strings.CS.replace(groupName, String.valueOf(SUBSTITUTE), ".");
             }
             else {
                 groupName = pattern;

@@ -70,6 +70,7 @@ public class SwiftMarker {
 
     /**
      * Render the template by data model object with the global process context
+     *
      * @param dataModel
      * @param processContext
      * @return

@@ -11,7 +11,7 @@ import static com.github.swiftech.swiftmarker.constant.Constants.*;
 
 /**
  * Compare value if they are numbers.
- * If not but String, compares the length of the String.
+ * If not but String, compare the length of the String.
  * (Not support collection size yet)
  *
  * @author swiftech
@@ -32,7 +32,7 @@ public class LogicalOperation extends BaseOperation {
 
     private void parseExpression() {
         Optional<String> first = ALL_LOGIC_EXPS.stream().filter(expression::contains).findFirst();
-        if (!first.isPresent()) {
+        if (first.isEmpty()) {
             this.isValid = false;
             return;
         }

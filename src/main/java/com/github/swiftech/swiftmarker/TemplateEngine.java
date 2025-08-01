@@ -101,9 +101,8 @@ public class TemplateEngine {
         for (int i = directiveCursor; i < directives.size(); i++) {
             // check if logic false or loop available
             Directive directive = directives.get(i);
-            if (directive instanceof LogicBegin) {
+            if (directive instanceof LogicBegin logicBegin) {
                 debugDirective("logic begin ->", i, level);
-                LogicBegin logicBegin = (LogicBegin) directive;
                 if (directiveStack.isTopAvailable()) {
                     boolean available = dataModelHandler.isLogicalTrueOrFalse(logicBegin.getValue());
                     debugDirective(available ? "available" : "not available", i, level);
@@ -125,11 +124,10 @@ public class TemplateEngine {
                     directiveStack.push(logicBegin);
                 }
             }
-            else if (directive instanceof LogicEnd) {
+            else if (directive instanceof LogicEnd logicEnd) {
                 debugDirective("logic end", i, level);
                 Directive last = directiveStack.peek();
                 if (last instanceof LogicBegin) {
-                    LogicEnd logicEnd = (LogicEnd) directive;
                     logicEnd.setAvailable(((LogicBegin) last).isAvailable());
                     directiveStack.pop();
                     if (logicEnd.isAvailable() && logicEnd.isWrappedWithLineBreak()) {
@@ -142,11 +140,10 @@ public class TemplateEngine {
                     throw new RuntimeException("NOT MATCHED LOGIC DIRECTIVE");
                 }
             }
-            else if (directive instanceof LoopBegin) {
+            else if (directive instanceof LoopBegin loopBegin) {
                 debugDirective("loop begin ->", i, level);
                 // 从当前模型中获取集合，将集合元素倒序压入堆栈
                 if (directiveStack.isTopAvailable()) {
-                    LoopBegin loopBegin = (LoopBegin) directive;
                     // 去除循环开始指令的独占的一行
                     if (loopBegin.isWrappedWithLineBreak()) {
                         debugDirective("trim last line break", i, level);
@@ -186,9 +183,8 @@ public class TemplateEngine {
                     }
                 }
             }
-            else if (directive instanceof LoopEnd) {
+            else if (directive instanceof LoopEnd loopEnd) {
                 debugDirective("<- loop end", i, level);
-                LoopEnd loopEnd = (LoopEnd) directive;
                 if (directiveStack.isTopLoopBegin()) {
                     if (directiveStack.isTopAvailable()) {
                         loopEnd.setAvailable(true);
@@ -216,9 +212,8 @@ public class TemplateEngine {
                     renderContext.appendToBuffer(rendered);
                 }
             }
-            else if (directive instanceof Stanza) {
+            else if (directive instanceof Stanza stanza) {
                 if (directiveStack.isTopAvailable()) {
-                    Stanza stanza = (Stanza) directive;
                     if (stanza.getValue() != null) {
                         debugDirective("append stanza ", i, level);
                         debugDirective(String.format("'%s'", stanza.getValue()), i, level);
